@@ -51,6 +51,15 @@ function Home() {
 
   return (
     <SiteLayout settings={settings} menu={menu}>
+      {/* TOP SEARCH BAR */}
+      <section className="border-b border-border bg-background">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 py-4">
+          <SearchBar
+            locations={featuredProperties.map((p) => p.location).filter(Boolean) as string[]}
+          />
+        </div>
+      </section>
+
       {/* HERO */}
       {flags.home.hero && (
         <section className="relative overflow-hidden">
@@ -74,12 +83,6 @@ function Home() {
                   "Design-led apartments and villas across Dubai's best neighbourhoods."}
               </p>
             </div>
-          </div>
-          <div className="mx-auto -mt-16 md:-mt-20 max-w-6xl px-4 md:px-6 pb-10 relative z-10">
-            <SearchBar
-              locations={featuredProperties.map((p) => p.location).filter(Boolean) as string[]}
-              variant="overlay"
-            />
           </div>
         </section>
       )}
