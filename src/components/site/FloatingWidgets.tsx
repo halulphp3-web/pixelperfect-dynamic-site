@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
-import { ArrowUp, MessageCircle } from "lucide-react";
+import { ArrowUp, MessageCircle, Bot, X } from "lucide-react";
+import type { FeatureFlags } from "@/lib/public-content.functions";
 
-export function FloatingWidgets({ whatsapp }: { whatsapp?: string | null }) {
+export function FloatingWidgets({
+  whatsapp,
+  flags,
+}: {
+  whatsapp?: string | null;
+  flags: FeatureFlags;
+}) {
   const [show, setShow] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   useEffect(() => {
     const onScroll = () => setShow(window.scrollY > 400);
     onScroll();
@@ -10,28 +18,56 @@ export function FloatingWidgets({ whatsapp }: { whatsapp?: string | null }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
-    <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-3">
-      {whatsapp && (
-        <a
-          href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="grid h-12 w-12 place-items-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 transition"
-          aria-label="Chat on WhatsApp"
-        >
-          <MessageCircle className="h-5 w-5" />
-        </a>
+    <>
+      <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-3">
+        {flags.widgets.ai_chat && (
+          <button
+            onClick={() => setChatOpen((v) => !v)}
+            className="grid h-12 w-12 place-items-center rounded-full bg-foreground text-background shadow-lg hover:scale-105 transition"
+            aria-label="Open chat"
+          >
+            <Bot className="h-5 w-5" />
+          </button>
+        )}
+        {flags.widgets.whatsapp && whatsapp && (
+          <a
+            href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="grid h-12 w-12 place-items-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 transition"
+            aria-label="Chat on WhatsApp"
+          >
+            <MessageCircle className="h-5 w-5" />
+          </a>
+        )}
+        {flags.widgets.back_to_top && show && (
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90"
+            aria-label="Back to top"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+
+      {flags.widgets.ai_chat && chatOpen && (
+        <div className="fixed bottom-24 right-5 z-40 w-80 max-w-[calc(100vw-2.5rem)] rounded-xl border border-border bg-card p-4 shadow-2xl">
+          <div className="flex items-center justify-between">
+            <div className="font-semibold text-sm">Concierge</div>
+            <button onClick={() => setChatOpen(false)} aria-label="Close" className="p-1 hover:bg-accent rounded">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Hi! Ask about stays, availability, or the neighbourhood — a host will reply shortly.
+          </p>
+          <div className="mt-3 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+            Live chat is being set up. In the meantime, message us on WhatsApp for a fast reply.
+          </div>
+        </div>
       )}
-      {show && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90"
-          aria-label="Back to top"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </button>
-      )}
-    </div>
+    </>
   );
 }
 
@@ -48,10 +84,7 @@ export function CookieConsent() {
         We use cookies to improve your experience. By continuing you agree to our use of cookies.
       </p>
       <div className="mt-3 flex justify-end gap-2">
-        <button
-          onClick={() => setShow(false)}
-          className="rounded-md px-3 py-1.5 text-sm hover:bg-accent"
-        >
+        <button onClick={() => setShow(false)} className="rounded-md px-3 py-1.5 text-sm hover:bg-accent">
           Decline
         </button>
         <button

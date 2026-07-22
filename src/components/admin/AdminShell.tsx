@@ -2,16 +2,17 @@ import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-route
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Settings, Wrench, Sparkles, LayoutList, MessageSquare,
-  Newspaper, Image as ImageIcon, MenuIcon, Star, Gauge, LogOut, Home,
+  Newspaper, Image as ImageIcon, MenuIcon, Star, Gauge, LogOut, Home, BedDouble,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/settings", label: "Website Settings", icon: Settings },
+  { to: "/admin/properties", label: "Properties", icon: BedDouble },
   { to: "/admin/menu", label: "Menu Builder", icon: MenuIcon },
   { to: "/admin/hero", label: "Hero Slides", icon: Sparkles },
-  { to: "/admin/services", label: "Services", icon: Wrench },
+  { to: "/admin/services", label: "Concierge Services", icon: Wrench },
   { to: "/admin/features", label: "Features", icon: LayoutList },
   { to: "/admin/stats", label: "Stats / Counters", icon: Gauge },
   { to: "/admin/testimonials", label: "Testimonials", icon: Star },

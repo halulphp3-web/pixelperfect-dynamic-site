@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
+import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { getSiteData, submitContactMessage } from "@/lib/public-content.functions";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -16,14 +17,19 @@ const schema = z.object({
   message: z.string().trim().min(1, "Required").max(5000),
 });
 
+const searchSchema = z.object({
+  property: fallback(z.string(), "").default(""),
+});
+
 export const Route = createFileRoute("/contact")({
+  validateSearch: zodValidator(searchSchema),
   loader: ({ context }) => context.queryClient.ensureQueryData(siteQuery),
   head: () => ({
     meta: [
-      { title: "Contact — Northline Services" },
-      { name: "description", content: "Get in touch — tell us what you need and we'll come back with a plan." },
-      { property: "og:title", content: "Contact — Northline" },
-      { property: "og:description", content: "Get in touch — tell us what you need and we'll come back with a plan." },
+      { title: "Contact us — book your next stay" },
+      { name: "description", content: "Tell us about your trip and a host will get back within one business day." },
+      { property: "og:title", content: "Contact us" },
+      { property: "og:description", content: "Tell us about your trip and a host will get back within one business day." },
       { property: "og:url", content: "/contact" },
     ],
     links: [{ rel: "canonical", href: "/contact" }],
@@ -34,9 +40,19 @@ export const Route = createFileRoute("/contact")({
 function Contact() {
   const { data: site } = useSuspenseQuery(siteQuery);
   const s = site.settings;
+  const { property } = Route.useSearch();
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [errMsg, setErrMsg] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (property) {
+      setSubject(`Availability request: ${property}`);
+      setMessage(`Hi,\n\nI'd like to check availability for "${property}".\n\nDates:\nGuests:\n\nThanks!`);
+    }
+  }, [property]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,6 +71,8 @@ function Contact() {
       await submitContactMessage({ data: parsed.data });
       setStatus("ok");
       (e.target as HTMLFormElement).reset();
+      setSubject("");
+      setMessage("");
     } catch (err: any) {
       setStatus("error");
       setErrMsg(err?.message ?? "Something went wrong");
@@ -66,15 +84,11 @@ function Contact() {
       <section className="mx-auto max-w-7xl px-4 md:px-6 py-20 grid gap-12 md:grid-cols-2">
         <div>
           <div className="text-sm font-medium text-primary">Contact</div>
-          <h1 className="mt-2 text-4xl md:text-5xl font-bold tracking-tight">Let's talk</h1>
-          <p className="mt-3 text-muted-foreground">Send us a message and we'll get back within one business day.</p>
+          <h1 className="mt-2 text-4xl md:text-5xl font-bold tracking-tight">Let's plan your stay</h1>
+          <p className="mt-3 text-muted-foreground">Send us a message and a host will get back within one business day.</p>
           <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
-            {s?.email && (
-              <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-primary" />{s.email}</li>
-            )}
-            {s?.phone && (
-              <li className="flex items-center gap-3"><Phone className="h-4 w-4 text-primary" />{s.phone}</li>
-            )}
+            {s?.email && <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-primary" />{s.email}</li>}
+            {s?.phone && <li className="flex items-center gap-3"><Phone className="h-4 w-4 text-primary" />{s.phone}</li>}
             {s?.address && (
               <li className="flex items-start gap-3"><MapPin className="h-4 w-4 mt-0.5 text-primary" />{s.address}</li>
             )}
@@ -85,9 +99,9 @@ function Contact() {
           <Field label="Email" name="email" type="email" error={errors.email} />
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Phone" name="phone" error={errors.phone} />
-            <Field label="Subject" name="subject" error={errors.subject} />
+            <Field label="Subject" name="subject" error={errors.subject} value={subject} onChange={setSubject} />
           </div>
-          <Field label="Message" name="message" textarea error={errors.message} />
+          <Field label="Message" name="message" textarea error={errors.message} value={message} onChange={setMessage} />
           <button
             disabled={status === "sending"}
             className="w-full rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground disabled:opacity-60"
@@ -103,21 +117,27 @@ function Contact() {
 }
 
 function Field({
-  label, name, type = "text", textarea, error,
-}: { label: string; name: string; type?: string; textarea?: boolean; error?: string }) {
+  label, name, type = "text", textarea, error, value, onChange,
+}: {
+  label: string; name: string; type?: string; textarea?: boolean; error?: string;
+  value?: string; onChange?: (v: string) => void;
+}) {
+  const controlled = value !== undefined && onChange !== undefined;
   return (
     <label className="block">
       <span className="block text-sm font-medium mb-1">{label}</span>
       {textarea ? (
         <textarea
           name={name}
-          rows={5}
+          rows={6}
+          {...(controlled ? { value, onChange: (e: any) => onChange!(e.target.value) } : {})}
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
       ) : (
         <input
           type={type}
           name={name}
+          {...(controlled ? { value, onChange: (e: any) => onChange!(e.target.value) } : {})}
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
       )}
