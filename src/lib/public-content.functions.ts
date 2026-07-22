@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import type { Database } from "@/integrations/supabase/types";
+import type { Database, Tables } from "@/integrations/supabase/types";
+
 
 function serverClient() {
   const url = process.env.SUPABASE_URL!;
@@ -33,7 +34,18 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   properties_page: { map: true, filters: true },
 };
 
-export const getSiteData = createServerFn({ method: "GET" }).handler(async () => {
+type SiteData = {
+  settings: Tables<"site_settings"> | null;
+  menu: Tables<"menu_items">[];
+  hero: Tables<"hero_slides">[];
+  services: Tables<"services">[];
+  features: Tables<"features">[];
+  stats: Tables<"stats">[];
+  testimonials: Tables<"testimonials">[];
+  featuredProperties: Tables<"properties">[];
+};
+
+export const getSiteData = createServerFn({ method: "GET" }).handler(async (): Promise<SiteData> => {
   const sb = serverClient();
   const [settings, menu, hero, services, features, stats, testimonials, featured] = await Promise.all([
     sb.from("site_settings").select("*").eq("id", 1).maybeSingle(),
@@ -45,7 +57,7 @@ export const getSiteData = createServerFn({ method: "GET" }).handler(async () =>
     sb.from("testimonials").select("*").eq("active", true).order("sort"),
     sb.from("properties").select("*").eq("active", true).eq("featured", true).order("sort").limit(6),
   ]);
-  return {
+  return JSON.parse(JSON.stringify({
     settings: settings.data,
     menu: menu.data ?? [],
     hero: hero.data ?? [],
@@ -54,7 +66,7 @@ export const getSiteData = createServerFn({ method: "GET" }).handler(async () =>
     stats: stats.data ?? [],
     testimonials: testimonials.data ?? [],
     featuredProperties: featured.data ?? [],
-  };
+  }));
 });
 
 export const getServiceBySlug = createServerFn({ method: "GET" })
@@ -92,13 +104,21 @@ export const listProperties = createServerFn({ method: "GET" })
       })
       .parse(v ?? {}),
   )
-  .handler(async ({ data }) => {
-    const sb = serverClient();
-    let q = sb.from("properties").select("*").eq("active", true).order("sort");
-    if (data.guests) q = q.gte("guests", data.guests);
-    if (data.search) q = q.or(`title.ilike.%${data.search}%,location.ilike.%${data.search}%,property_type.ilike.%${data.search}%`);
-    const { data: rows } = await q;
-    return rows ?? [];
+  .handler(async ({ data }): Promise<Tables<"properties">[]> => {
+    try {
+      const sb = serverClient();
+      let q = sb.from("properties").select("*").eq("active", true).order("sort");
+      if (data.guests) q = q.gte("guests", data.guests);
+      if (data.search) q = q.or(`title.ilike.%${data.search}%,location.ilike.%${data.search}%,property_type.ilike.%${data.search}%`);
+      const { data: rows, error } = await q;
+      if (error) { console.error("[listProperties] supabase error", error); throw new Error(error.message); }
+      const out = JSON.parse(JSON.stringify(rows ?? []));
+      console.log("[listProperties] rows=", out.length);
+      return out;
+    } catch (e: any) {
+      console.error("[listProperties] handler error", e?.message, e?.stack);
+      throw new Error(String(e?.message ?? e));
+    }
   });
 
 export const getPropertyBySlug = createServerFn({ method: "GET" })
@@ -111,7 +131,7 @@ export const getPropertyBySlug = createServerFn({ method: "GET" })
       .eq("slug", data.slug)
       .eq("active", true)
       .maybeSingle();
-    return prop;
+    return prop ? JSON.parse(JSON.stringify(prop)) : null;
   });
 
 export const submitContactMessage = createServerFn({ method: "POST" })

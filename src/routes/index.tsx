@@ -4,6 +4,7 @@ import * as Icons from "lucide-react";
 import { ArrowRight, BedDouble, Bath, Users, MapPin, Quote, Star } from "lucide-react";
 import { getSiteData } from "@/lib/public-content.functions";
 import { SiteLayout, useFlags } from "@/components/site/SiteLayout";
+import { SearchBar } from "@/components/site/SearchBar";
 import { useSite } from "@/lib/site-context";
 import { formatPrice } from "@/lib/currency";
 
@@ -63,33 +64,22 @@ function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
           </div>
-          <div className="mx-auto max-w-7xl px-4 md:px-6 pt-24 md:pt-36 pb-16 md:pb-24 text-white">
+          <div className="mx-auto max-w-7xl px-4 md:px-6 pt-24 md:pt-36 pb-28 md:pb-40 text-white">
             <div className="max-w-3xl animate-fade-in">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
-                <span className="h-2 w-2 rounded-full bg-primary" /> Trusted by 12,000+ guests
-              </div>
-              <h1 className="mt-5 text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
                 {first?.heading ?? settings?.tagline ?? "Feel at home, wherever you land."}
               </h1>
               <p className="mt-5 text-lg text-white/85 max-w-xl">
                 {first?.subheading ??
-                  "Design-led apartments and villas across Dubai's best neighbourhoods — verified, cleaned, and cared for."}
+                  "Design-led apartments and villas across Dubai's best neighbourhoods."}
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  to="/properties"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
-                >
-                  Explore stays <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center rounded-md border border-white/30 bg-white/10 px-5 py-3 text-sm font-medium text-white backdrop-blur hover:bg-white/20"
-                >
-                  Talk to a host
-                </Link>
-              </div>
             </div>
+          </div>
+          <div className="mx-auto -mt-16 md:-mt-20 max-w-6xl px-4 md:px-6 pb-10 relative z-10">
+            <SearchBar
+              locations={featuredProperties.map((p) => p.location).filter(Boolean) as string[]}
+              variant="overlay"
+            />
           </div>
         </section>
       )}
