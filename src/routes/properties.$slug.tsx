@@ -1,10 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { BedDouble, Bath, Users, MapPin, Check, ArrowRight, Clock } from "lucide-react";
+import { useState } from "react";
+import { BedDouble, Bath, Users, MapPin, Check, Clock, CalendarDays, MessageCircle, ShieldCheck } from "lucide-react";
+import { format, differenceInCalendarDays } from "date-fns";
+import type { DateRange } from "react-day-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { getPropertyBySlug, getSiteData } from "@/lib/public-content.functions";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useSite } from "@/lib/site-context";
-import { formatPrice } from "@/lib/currency";
+import { formatPrice, convertFromAED, CURRENCY_SYMBOL } from "@/lib/currency";
 
 const siteQuery = queryOptions({ queryKey: ["site-data"], queryFn: () => getSiteData(), staleTime: 60_000 });
 
