@@ -11,10 +11,12 @@ export function SearchBar({
   locations = [],
   className,
   variant = "solid",
+  onSubmit,
 }: {
   locations?: string[];
   className?: string;
   variant?: "solid" | "overlay" | "header";
+  onSubmit?: (v: { destination: string; range: DateRange | undefined; guests: number }) => void;
 }) {
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
@@ -35,6 +37,10 @@ export function SearchBar({
     : "Choose the date";
 
   const submit = () => {
+    if (onSubmit) {
+      onSubmit({ destination, range, guests });
+      return;
+    }
     navigate({
       to: "/properties",
       search: { search: destination || undefined, guests: guests || undefined } as any,
