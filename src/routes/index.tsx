@@ -83,59 +83,6 @@ function Home() {
         setTimeout(() => document.getElementById("home-results")?.scrollIntoView({ behavior: "smooth" }), 50);
       }}
     >
-      {filter && (
-        <section id="home-results" className="mx-auto max-w-7xl px-4 md:px-6 pt-10">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Search results</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {results.length} stay{results.length === 1 ? "" : "s"} match your search.
-              </p>
-            </div>
-            <button
-              onClick={() => setFilter(null)}
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Clear
-            </button>
-          </div>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((p) => (
-              <Link
-                key={p.id}
-                to="/properties/$slug"
-                params={{ slug: p.slug }}
-                className="group overflow-hidden rounded-2xl border border-border bg-card hover:shadow-lg transition"
-              >
-                <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  {p.cover_image_url && (
-                    <img src={p.cover_image_url} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                  )}
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5" /> {p.location}
-                  </div>
-                  <div className="mt-1.5 font-semibold line-clamp-1">{p.title}</div>
-                  <div className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.summary}</div>
-                  <div className="mt-3 text-lg font-bold">
-                    {formatPrice(Number(p.price_per_night), currency)}
-                    <span className="text-xs font-normal text-muted-foreground"> / night</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-            {results.length === 0 && (
-              <div className="col-span-full rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
-                No stays match. Try different filters.
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-
-
       {/* HERO */}
       {flags.home.hero && (
         <section className="relative overflow-hidden">
@@ -180,23 +127,35 @@ function Home() {
         </section>
       )}
 
-      {/* FEATURED PROPERTIES */}
-      {flags.home.properties && featuredProperties.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 md:px-6 py-20">
+      {/* FEATURED PROPERTIES / SEARCH RESULTS */}
+      {flags.home.properties && (featuredProperties.length > 0 || filter) && (
+        <section id="home-results" className="mx-auto max-w-7xl px-4 md:px-6 py-20">
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div className="max-w-2xl">
-              <div className="text-sm font-medium text-primary">Featured stays</div>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight">Handpicked homes, ready when you are</h2>
+              <div className="text-sm font-medium text-primary">{filter ? "Search results" : "Featured stays"}</div>
+              <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight">
+                {filter
+                  ? `${results.length} stay${results.length === 1 ? "" : "s"} match your search`
+                  : "Handpicked homes, ready when you are"}
+              </h2>
               <p className="mt-3 text-muted-foreground">
-                Every property is inspected, styled, and supported by a real team on the ground.
+                {filter
+                  ? "Refine your dates and guests to see more options."
+                  : "Every property is inspected, styled, and supported by a real team on the ground."}
               </p>
             </div>
-            <Link to="/properties" className="text-sm font-medium text-primary hover:underline">
-              View all →
-            </Link>
+            {filter ? (
+              <button onClick={() => setFilter(null)} className="text-sm font-medium text-primary hover:underline">
+                Clear search
+              </button>
+            ) : (
+              <Link to="/properties" className="text-sm font-medium text-primary hover:underline">
+                View all →
+              </Link>
+            )}
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProperties.map((p) => (
+            {(filter ? results : featuredProperties).map((p) => (
               <Link
                 key={p.id}
                 to="/properties/$slug"
@@ -236,40 +195,15 @@ function Home() {
                 </div>
               </Link>
             ))}
+            {filter && results.length === 0 && (
+              <div className="col-span-full rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
+                No stays match. Try different filters.
+              </div>
+            )}
           </div>
         </section>
       )}
 
-      {/* SERVICES */}
-      {flags.home.services && services.length > 0 && (
-        <section className="bg-muted/30 border-y border-border">
-          <div className="mx-auto max-w-7xl px-4 md:px-6 py-20">
-            <div className="max-w-2xl">
-              <div className="text-sm font-medium text-primary">Concierge</div>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight">Everything taken care of</h2>
-              <p className="mt-3 text-muted-foreground">
-                From arrival to checkout, our team is one message away.
-              </p>
-            </div>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((s) => (
-                <Link
-                  key={s.id}
-                  to="/services/$slug"
-                  params={{ slug: s.slug }}
-                  className="group rounded-xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition"
-                >
-                  <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
-                    <Icon name={s.icon} className="h-5 w-5" />
-                  </div>
-                  <div className="mt-4 font-semibold">{s.title}</div>
-                  <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{s.summary}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* FEATURES */}
       {flags.home.features && features.length > 0 && (

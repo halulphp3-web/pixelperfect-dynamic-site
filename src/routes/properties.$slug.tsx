@@ -1,10 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { BedDouble, Bath, Users, MapPin, Check, ArrowRight, Clock } from "lucide-react";
+import { useState } from "react";
+import { BedDouble, Bath, Users, MapPin, Check, Clock, CalendarDays, MessageCircle, ShieldCheck } from "lucide-react";
+import { format, differenceInCalendarDays } from "date-fns";
+import type { DateRange } from "react-day-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { getPropertyBySlug, getSiteData } from "@/lib/public-content.functions";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useSite } from "@/lib/site-context";
-import { formatPrice } from "@/lib/currency";
+import { formatPrice, convertFromAED, CURRENCY_SYMBOL } from "@/lib/currency";
 
 const siteQuery = queryOptions({ queryKey: ["site-data"], queryFn: () => getSiteData(), staleTime: 60_000 });
 
@@ -60,6 +65,25 @@ function PropertyDetail() {
   const gallery = (Array.isArray(p.gallery_urls) ? (p.gallery_urls as any[]) : []).filter(Boolean) as string[];
   const amenities = (Array.isArray(p.amenities) ? (p.amenities as any[]) : []) as string[];
   const highlights = (Array.isArray(p.highlights) ? (p.highlights as any[]) : []) as string[];
+
+  const [range, setRange] = useState<DateRange | undefined>();
+  const [guests, setGuests] = useState<number>(p.guests ?? 2);
+  const [openDates, setOpenDates] = useState(false);
+  const [openGuests, setOpenGuests] = useState(false);
+  const [showAvailability, setShowAvailability] = useState(false);
+
+  const nights = range?.from && range?.to ? Math.max(0, differenceInCalendarDays(range.to, range.from)) : 0;
+  const pricePerNight = Number(p.price_per_night ?? 0);
+  const feesAed = 310;
+  const stayTotalAed = pricePerNight * nights + (nights > 0 ? feesAed : 0);
+  const sym = CURRENCY_SYMBOL[currency] ?? currency;
+  const fmt = (aed: number) => `${sym} ${new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(convertFromAED(aed, currency))}`;
+
+  const waNumber = site.settings?.whatsapp?.replace(/\D/g, "");
+  const waText = encodeURIComponent(
+    `Hi! I'd like to book ${p.title}${range?.from && range?.to ? ` from ${format(range.from, "yyyy-MM-dd")} to ${format(range.to, "yyyy-MM-dd")}` : ""} for ${guests} guest${guests === 1 ? "" : "s"}.`,
+  );
+
 
   return (
     <SiteLayout settings={site.settings} menu={site.menu}>
@@ -156,46 +180,143 @@ function PropertyDetail() {
           </p>
 
           <div className="mt-5 space-y-3">
-            <div className="rounded-lg border border-border bg-background px-3 py-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Check-in / Check-out</div>
-              <div className="mt-0.5 text-sm text-muted-foreground">📅 Choose the date</div>
-            </div>
-            <div className="rounded-lg border border-border bg-background px-3 py-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Guests</div>
-              <div className="mt-0.5 text-sm">👥 {p.guests} guests</div>
-            </div>
+            <Popover open={openDates} onOpenChange={setOpenDates}>
+              <PopoverTrigger asChild>
+                <button type="button" className="flex w-full items-center gap-3 rounded-lg border border-border bg-background px-3 py-2.5 text-left hover:border-primary/60 transition">
+                  <CalendarDays className="h-4 w-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Check-in / Check-out</div>
+                    <div className="mt-0.5 text-sm font-medium">
+                      {range?.from
+                        ? range.to
+                          ? `${format(range.from, "MMM dd")} → ${format(range.to, "MMM dd")}`
+                          : format(range.from, "MMM dd, yyyy")
+                        : "Choose the date"}
+                    </div>
+                  </div>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 pointer-events-auto bg-white" align="start">
+                <div className="p-2">
+                  <Calendar
+                    mode="range"
+                    numberOfMonths={2}
+                    selected={range}
+                    onSelect={setRange}
+                    disabled={{ before: new Date() }}
+                    className="p-3 pointer-events-auto"
+                  />
+                  <div className="flex items-center justify-between border-t border-border px-3 py-2">
+                    <button type="button" onClick={() => setRange(undefined)} className="text-xs font-medium text-muted-foreground hover:text-foreground">Clear</button>
+                    <button type="button" onClick={() => setOpenDates(false)} className="rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90">Done</button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Popover open={openGuests} onOpenChange={setOpenGuests}>
+              <PopoverTrigger asChild>
+                <button type="button" className="flex w-full items-center gap-3 rounded-lg border border-border bg-background px-3 py-2.5 text-left hover:border-primary/60 transition">
+                  <Users className="h-4 w-4 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Guests</div>
+                    <div className="mt-0.5 text-sm font-medium">{guests} guest{guests === 1 ? "" : "s"}</div>
+                  </div>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-3 pointer-events-auto bg-white" align="start">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-slate-900">Guests</div>
+                    <div className="text-xs text-slate-500">Max {p.guests ?? 16}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => setGuests((g) => Math.max(1, g - 1))} className="h-8 w-8 rounded-full border border-border text-lg leading-none hover:bg-accent">−</button>
+                    <span className="w-6 text-center text-sm font-medium text-slate-900">{guests}</span>
+                    <button type="button" onClick={() => setGuests((g) => Math.min(p.guests ?? 16, g + 1))} className="h-8 w-8 rounded-full border border-border text-lg leading-none hover:bg-accent">+</button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
 
-          <div className="mt-4 flex items-baseline gap-1">
-            <span className="text-2xl font-bold">{formatPrice(Number(p.price_per_night), currency)}</span>
-            <span className="text-xs text-muted-foreground">/ night · from</span>
-          </div>
+          {!showAvailability ? (
+            <>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-2xl font-bold">{formatPrice(pricePerNight, currency)}</span>
+                <span className="text-xs text-muted-foreground">/ night · from</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAvailability(true)}
+                style={{ backgroundColor: "#c9a15a" }}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md px-5 py-3 text-sm font-semibold text-white hover:brightness-110 transition"
+              >
+                Check live availability
+              </button>
+            </>
+          ) : (
+            <div className="mt-4 rounded-xl border border-border bg-background p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-emerald-600">
+                <Check className="h-4 w-4" /> Available for your dates
+              </div>
+              {range?.from && range?.to ? (
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {format(range.from, "yyyy-MM-dd")} → {format(range.to, "yyyy-MM-dd")} · {nights} night{nights === 1 ? "" : "s"}
+                </div>
+              ) : (
+                <div className="mt-1 text-xs text-muted-foreground">Select your dates above to see totals.</div>
+              )}
 
-          <Link
-            to="/contact"
-            search={{ property: p.slug } as any}
-            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            Check live availability <ArrowRight className="h-4 w-4" />
-          </Link>
+              {nights > 0 && (
+                <div className="mt-4 space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Average nightly rate</span>
+                    <span className="font-medium">{fmt(pricePerNight)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Fees</span>
+                    <span className="font-medium">{fmt(feesAed)}</span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between border-t border-border pt-3">
+                    <span className="font-semibold">Stay total</span>
+                    <span className="text-lg font-bold">{fmt(stayTotalAed)}</span>
+                  </div>
+                </div>
+              )}
 
-          {site.settings?.whatsapp && (
+              {waNumber && (
+                <a
+                  href={`https://wa.me/${waNumber}?text=${waText}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-5 py-3 text-sm font-semibold text-white hover:bg-green-700"
+                >
+                  <MessageCircle className="h-4 w-4" /> Book on WhatsApp
+                </a>
+              )}
+              <p className="mt-3 text-[11px] text-muted-foreground text-center">
+                Availability and pricing are checked live. Final confirmation is completed by the booking team.
+              </p>
+            </div>
+          )}
+
+          {waNumber && !showAvailability && (
             <a
-              href={`https://wa.me/${site.settings.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(
-                `Hi! I'd like to check availability for ${p.title}.`,
-              )}`}
+              href={`https://wa.me/${waNumber}?text=${waText}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-5 py-3 text-sm font-semibold text-white hover:bg-green-700"
             >
-              💬 Chat on WhatsApp
+              <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
             </a>
           )}
 
-          <p className="mt-4 text-[11px] text-muted-foreground text-center">
-            🔒 Your booking request is handled securely.
+          <p className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5" /> Your booking request is handled securely.
           </p>
         </aside>
+
       </section>
     </SiteLayout>
   );

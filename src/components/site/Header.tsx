@@ -14,12 +14,14 @@ export function Header({
   flags,
   locations = [],
   onSearch,
+  hideSearch = false,
 }: {
   settings: Settings;
   menu: MenuItem[];
   flags: FeatureFlags;
   locations?: string[];
   onSearch?: (v: { destination: string; guests: number }) => void;
+  hideSearch?: boolean;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const { currency, setCurrency, supportedCurrencies, lang, setLang, theme, toggleTheme } = useSite();
@@ -49,13 +51,16 @@ export function Header({
           <span className="hidden sm:inline whitespace-nowrap">{settings?.site_name ?? "Stays"}</span>
         </Link>
 
-        <div className="flex-1 min-w-0 hidden md:block">
-          <SearchBar
-            locations={locations}
-            variant="header"
-            onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
-          />
-        </div>
+        {!hideSearch && (
+          <div className="flex-1 min-w-0 hidden md:block">
+            <SearchBar
+              locations={locations}
+              variant="header"
+              onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
+            />
+          </div>
+        )}
+        {hideSearch && <div className="flex-1" />}
 
         <div className="flex shrink-0 items-center gap-2">
           {flags.header.currency_switcher && (
@@ -92,13 +97,15 @@ export function Header({
         </div>
       </div>
 
-      <div className="md:hidden border-t border-border/60 px-4 py-3">
-        <SearchBar
-          locations={locations}
-          variant="header"
-          onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
-        />
-      </div>
+      {!hideSearch && (
+        <div className="md:hidden border-t border-border/60 px-4 py-3">
+          <SearchBar
+            locations={locations}
+            variant="header"
+            onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
+          />
+        </div>
+      )}
     </header>
   );
 }
