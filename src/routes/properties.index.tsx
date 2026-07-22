@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { BedDouble, Bath, Users, MapPin, Search } from "lucide-react";
+import { z } from "zod";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { BedDouble, Bath, Users, MapPin } from "lucide-react";
 import { getSiteData, listProperties } from "@/lib/public-content.functions";
 import { SiteLayout, useFlags } from "@/components/site/SiteLayout";
+import { SearchBar } from "@/components/site/SearchBar";
 import { useSite } from "@/lib/site-context";
 import { formatPrice } from "@/lib/currency";
 
@@ -14,7 +17,13 @@ const propsQuery = queryOptions({
   staleTime: 30_000,
 });
 
+const searchSchema = z.object({
+  search: fallback(z.string(), "").default(""),
+  guests: fallback(z.number().int(), 0).default(0),
+});
+
 export const Route = createFileRoute("/properties/")({
+  validateSearch: zodValidator(searchSchema),
   loader: ({ context }) =>
     Promise.all([
       context.queryClient.ensureQueryData(siteQuery),
@@ -38,10 +47,11 @@ function PropertiesPage() {
   const { data: properties } = useSuspenseQuery(propsQuery);
   const flags = useFlags(site.settings);
   const { currency } = useSite();
+  const { search: qSearch, guests: qGuests } = Route.useSearch();
 
-  const [search, setSearch] = useState("");
-  const [guests, setGuests] = useState(0);
   const [type, setType] = useState<string>("");
+  const search = qSearch ?? "";
+  const guests = qGuests ?? 0;
 
   const types = useMemo(
     () => Array.from(new Set(properties.map((p) => p.property_type).filter(Boolean) as string[])),
@@ -59,44 +69,33 @@ function PropertiesPage() {
     return true;
   });
 
+  const allLocations = useMemo(
+    () => properties.map((p) => p.location).filter(Boolean) as string[],
+    [properties],
+  );
+
   return (
     <SiteLayout settings={site.settings} menu={site.menu}>
       <section className="border-b border-border bg-muted/30">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 pt-12 pb-8">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 pt-10 pb-8">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Find your next stay</h1>
           <p className="mt-2 text-muted-foreground">{filtered.length} homes available across Dubai.</p>
 
           {flags.properties_page.filters && (
-            <div className="mt-6 grid gap-3 md:grid-cols-[1fr_auto_auto]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by neighbourhood, name, or type…"
-                  className="w-full rounded-md border border-input bg-background pl-9 pr-3 py-2.5 text-sm"
-                />
+            <div className="mt-6 space-y-3">
+              <SearchBar locations={allLocations} />
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                >
+                  <option value="">Any type</option>
+                  {types.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
               </div>
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="rounded-md border border-input bg-background px-3 py-2.5 text-sm"
-              >
-                <option value="">Any type</option>
-                {types.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-              <select
-                value={guests}
-                onChange={(e) => setGuests(Number(e.target.value))}
-                className="rounded-md border border-input bg-background px-3 py-2.5 text-sm"
-              >
-                <option value={0}>Any guests</option>
-                {[1, 2, 3, 4, 5, 6, 8].map((n) => (
-                  <option key={n} value={n}>{n}+ guests</option>
-                ))}
-              </select>
             </div>
           )}
         </div>

@@ -47,19 +47,6 @@ export function Header({
         </Link>
 
         <div className="flex items-center gap-1">
-          <nav className="hidden lg:flex items-center gap-1">
-            {menu.map((m) => (
-              <Link
-                key={m.id}
-                to={m.url}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-accent"
-                activeProps={{ className: "text-foreground bg-accent" }}
-              >
-                {m.label}
-              </Link>
-            ))}
-          </nav>
-
           <div className="hidden sm:flex items-center gap-1 ml-1">
             {flags.header.currency_switcher && (
               <select
@@ -101,13 +88,15 @@ export function Header({
             Book now
           </Link>
 
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-accent"
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          {menu.length > 0 && (
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-accent"
+              aria-label="Toggle menu"
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          )}
         </div>
       </div>
 
