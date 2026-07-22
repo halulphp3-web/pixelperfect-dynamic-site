@@ -242,6 +242,93 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          active: boolean
+          amenities: Json
+          bathrooms: number
+          bedrooms: number
+          beds: number
+          check_in_time: string | null
+          check_out_time: string | null
+          cover_image_url: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          featured: boolean
+          gallery_urls: Json
+          guests: number
+          highlights: Json
+          id: string
+          lat: number | null
+          lng: number | null
+          location: string | null
+          price_per_night: number
+          property_type: string | null
+          slug: string
+          sort: number
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amenities?: Json
+          bathrooms?: number
+          bedrooms?: number
+          beds?: number
+          check_in_time?: string | null
+          check_out_time?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          featured?: boolean
+          gallery_urls?: Json
+          guests?: number
+          highlights?: Json
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          price_per_night?: number
+          property_type?: string | null
+          slug: string
+          sort?: number
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amenities?: Json
+          bathrooms?: number
+          bedrooms?: number
+          beds?: number
+          check_in_time?: string | null
+          check_out_time?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          featured?: boolean
+          gallery_urls?: Json
+          guests?: number
+          highlights?: Json
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          price_per_night?: number
+          property_type?: string | null
+          slug?: string
+          sort?: number
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           active: boolean
@@ -290,8 +377,10 @@ export type Database = {
       site_settings: {
         Row: {
           address: string | null
+          default_currency: string
           email: string | null
           favicon_url: string | null
+          feature_flags: Json
           google_map_embed: string | null
           id: number
           logo_url: string | null
@@ -300,14 +389,17 @@ export type Database = {
           seo: Json
           site_name: string
           socials: Json
+          supported_currencies: Json
           tagline: string | null
           updated_at: string
           whatsapp: string | null
         }
         Insert: {
           address?: string | null
+          default_currency?: string
           email?: string | null
           favicon_url?: string | null
+          feature_flags?: Json
           google_map_embed?: string | null
           id?: number
           logo_url?: string | null
@@ -316,14 +408,17 @@ export type Database = {
           seo?: Json
           site_name?: string
           socials?: Json
+          supported_currencies?: Json
           tagline?: string | null
           updated_at?: string
           whatsapp?: string | null
         }
         Update: {
           address?: string | null
+          default_currency?: string
           email?: string | null
           favicon_url?: string | null
+          feature_flags?: Json
           google_map_embed?: string | null
           id?: number
           logo_url?: string | null
@@ -332,6 +427,7 @@ export type Database = {
           seo?: Json
           site_name?: string
           socials?: Json
+          supported_currencies?: Json
           tagline?: string | null
           updated_at?: string
           whatsapp?: string | null

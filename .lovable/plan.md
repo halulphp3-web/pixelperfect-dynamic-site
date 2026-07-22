@@ -1,79 +1,74 @@
-# Plan — Phase 1 (of a multi-phase build)
 
-An original business/services marketing site (same *category* as the reference, not a visual copy) plus the foundation of an admin CMS. Later phases layer on the rest of the modules you listed.
+## Scope
 
-## Ground rules
+Repurpose the site into a holiday-homes rental layout (inspired by the reference structure, original content and imagery). Keep everything CMS-driven and add admin toggles for every front-facing section and header feature.
 
-- Original design and original copy. No assets, layouts, or text copied from venduras.com or tadabeerhomes.com. I'll draft placeholder copy in a "professional home services / facility management" tone that you can edit.
-- Backend uses Lovable Cloud (Postgres + Auth + Storage + server functions). Admin roles live in a separate `user_roles` table.
-- Everything on the public site in Phase 1 is already DB-driven — no hardcoded strings in components. Later phases add more editable modules.
+No booking engine — a "Request availability" button on each property opens the existing contact form pre-filled with the property title.
 
-## Phase 1 scope (this plan)
+## What gets built
 
-Public site (all routes SSR, SEO metadata per route):
-- `/` Home — hero, services grid, features, industries, stats, testimonials, CTA
-- `/about`
-- `/services` + `/services/$slug`
-- `/contact` (form → `contact_messages` table)
-- Shared header (logo + nav from DB) and footer (columns, social links, newsletter signup)
+### 1. New `properties` table
+Columns (beyond id/created_at/updated_at):
+- `title`, `slug` (unique), `summary`, `description` (long text)
+- `location` (e.g. "Dubai Marina"), `property_type` ("Apartment", "Villa"…)
+- `bedrooms`, `bathrooms`, `guests`, `beds` (ints)
+- `price_per_night` (numeric), `currency` (default "AED")
+- `check_in_time`, `check_out_time` (text)
+- `cover_image_url`, `gallery_urls` (jsonb array)
+- `amenities` (jsonb array of strings), `highlights` (jsonb array)
+- `lat`, `lng` (numeric, for future map)
+- `featured` (bool), `active` (bool), `sort` (int)
 
-Admin (`/admin`, gated by `_authenticated` + `admin` role):
-- Login / logout, profile, change password
-- Dashboard (counts + recent messages)
-- Website Settings (name, logo, favicon, email, phone, WhatsApp, address, social links, SEO defaults, GA/GTM/Pixel IDs, custom head/footer scripts)
-- Pages CMS (title, slug, sections JSON, SEO fields, draft/publish, active)
-- Services CRUD (title, slug, icon, summary, body, order, active)
-- Menu builder (header nav items: label, url, order, active)
-- Hero slides CRUD (image, heading, subheading, CTA, order, active)
-- Testimonials CRUD
-- Stats/Counters CRUD
-- Contact messages inbox (list, view, mark read, delete)
-- Media library (upload to Storage bucket, list, delete)
-- Each list view: search, active/inactive filter, sort, pagination
+Public policy: `SELECT` where `active = true` for anon.
+Admin policy: full access via `has_role(auth.uid(),'admin')`.
+GRANTs per project rules.
 
-Cross-cutting in Phase 1:
-- Per-route `head()` metadata (title, description, canonical, OG, Twitter)
-- Sitemap + robots
-- Back-to-top, scroll animations, skeleton loading, lazy images
-- Cookie consent banner
-- WhatsApp floating button (uses number from settings)
-- Form validation with zod
-- Responsive/mobile-first, dark/light toggle
-- Basic schema.org markup (Organization on root, Service on service pages)
-
-## Deferred to later phases (not in Phase 1)
-
-Role & permission management UI, redirect manager, popup manager, mega menu builder, analytics dashboard, backup/restore, activity logs, SMTP settings UI, advanced global live search, multi-language, AI chatbot, recently-viewed, comments, scheduled publishing, Google Maps embed manager, related posts, SEO manager beyond per-page fields, image WebP pipeline. All possible on this foundation — just separate deliverables.
-
-## Data model (Phase 1)
-
+### 2. `site_settings` extension — feature flags
+Add a `feature_flags` jsonb column with defaults:
 ```
-profiles (id, full_name, avatar_url)
-user_roles (user_id, role: 'admin'|'editor'|'user')      -- has_role() SECURITY DEFINER
-site_settings (singleton row: name, logo_url, favicon_url, email, phone, whatsapp,
-               address, socials jsonb, seo jsonb, scripts jsonb)
-menu_items (id, label, url, parent_id, sort, active)
-hero_slides (id, image_url, heading, subheading, cta_label, cta_url, sort, active)
-services (id, slug, title, icon, summary, body, sort, active, seo jsonb)
-testimonials (id, name, role, avatar_url, quote, sort, active)
-stats (id, label, value, suffix, sort, active)
-pages (id, slug, title, sections jsonb, seo jsonb, status: draft|published, sort)
-contact_messages (id, name, email, phone, message, read, created_at)
-media (id, path, url, mime, size, uploaded_by, created_at)
+{
+  "home": { "hero": true, "stats": true, "services": true, "features": true, "properties": true, "testimonials": true, "cta": true },
+  "header": { "currency_switcher": true, "language_switcher": true, "dark_mode": true, "search_bar": false },
+  "widgets": { "whatsapp": true, "back_to_top": true, "ai_chat": false },
+  "properties_page": { "map": true, "filters": true }
+}
 ```
-Every table: RLS on. Public tables get `TO anon SELECT` where `active = true`. Writes restricted to `has_role(auth.uid(),'admin')`. `contact_messages` allows `TO anon INSERT` only.
+Also add `default_currency` ("AED") and `supported_currencies` (jsonb, e.g. `["AED","USD","EUR","GBP"]`).
 
-## Tech notes
+### 3. Public routes
+- `/properties` — grid of active properties, search bar (destination + guests), optional map panel (toggle-driven). Uses static rates for currency conversion in a client helper — no live FX.
+- `/properties/$slug` — hero gallery, key facts, description, amenities, highlights, "Request availability" CTA that deep-links to `/contact?property=<slug>`.
+- `/contact` — read `?property=` search param, prefill subject/message.
+- Home page: add a "Featured Properties" section (only if `home.properties` flag on). Every home section wrapped in its flag check.
 
-- TanStack Start file routes; public loaders use publishable-key server client, admin loaders under `_authenticated/admin/` use `requireSupabaseAuth`.
-- shadcn/ui + Tailwind v4 tokens in `src/styles.css`. I'll pick one distinctive visual direction (not the generic purple-on-white default) — happy to run design directions first if you want to pick the look.
-- Storage bucket `media` (public) for uploads.
-- First admin: after signup, I'll insert an `admin` role row for the first user via migration seed you specify, or add a one-time "claim admin" flow.
+### 4. Header enhancements (all flag-gated)
+- Currency switcher (AED/USD/EUR/GBP) — stored in `localStorage`, provided via React context; prices reformat on the fly.
+- Language switcher (EN/AR) — UI label only for now, sets `dir="rtl"` when AR.
+- Dark mode toggle — toggles `class="dark"` on `html`, persisted.
+- WhatsApp float + back-to-top — flag-gated in `FloatingWidgets`.
 
-## Open questions before I build
+### 5. Admin panel
+- New `/admin/properties` CRUD (extends existing `CrudPage`; adds an image-gallery + amenity chips editor via textarea → JSON parse).
+- New `/admin/settings` extension: "Feature Toggles" tab with checkboxes for every key in `feature_flags`, plus currency defaults.
+- Extend `admin.functions.ts` `tableSchema` enum with `"properties"`.
 
-1. **Design direction** — want me to generate 2–3 rendered design directions to pick from, or should I just commit to one clean modern direction and go?
-2. **First admin user** — give me the email you'll sign up with so the migration can grant it the admin role, or I'll add a one-time bootstrap page.
-3. **Brand basics** — site name, tagline, primary color preference (or "you choose"). Placeholder copy is fine for everything else.
+### 6. Server functions
+- `getSiteData` → also return `feature_flags`, `default_currency`, `supported_currencies`, and `featuredProperties`.
+- `listProperties({ search?, guests? })`, `getPropertyBySlug({ slug })` — public.
+- `updateSettings` already exists; extend to accept the new jsonb field.
 
-Reply with answers to those three and I'll switch to build mode and start Phase 1.
+### 7. Seed content
+Insert 6 original demo properties (generic Dubai holiday-home style, original titles/descriptions; images sourced via imagegen so no third-party assets).
+
+## Technical details
+
+- Migration order per project rules: CREATE TABLE → GRANT → ENABLE RLS → CREATE POLICY. Trigger `set_updated_at` on the new table.
+- Feature flags read in `SiteLayout`, `Header`, `FloatingWidgets`, and home route via the `settings` object already threaded through.
+- Currency context: `CurrencyProvider` in `__root.tsx`; conversion table is a plain constant map exported from `src/lib/currency.ts`. Clearly labelled "approx".
+- Images: 6 generated JPGs saved under `src/assets/properties/` and one hero for the home page. All original.
+- No new packages required.
+- Auth-gated admin routes stay under `_authenticated/admin/…`.
+
+## Out of scope (say-so needed)
+
+- Real availability calendar, payments, live FX, real translations, real AI chat.
