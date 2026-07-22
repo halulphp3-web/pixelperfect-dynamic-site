@@ -1,0 +1,2 @@
+DROP POLICY "Admins manage properties" ON public.properties;
+CREATE POLICY "Admins manage properties" ON public.properties AS PERMISSIVE FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
