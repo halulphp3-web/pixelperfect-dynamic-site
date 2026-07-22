@@ -13,11 +13,13 @@ export function Header({
   settings,
   flags,
   locations = [],
+  onSearch,
 }: {
   settings: Settings;
   menu: MenuItem[];
   flags: FeatureFlags;
   locations?: string[];
+  onSearch?: (v: { destination: string; guests: number }) => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const { currency, setCurrency, supportedCurrencies, lang, setLang, theme, toggleTheme } = useSite();
@@ -48,7 +50,11 @@ export function Header({
         </Link>
 
         <div className="flex-1 min-w-0 hidden md:block">
-          <SearchBar locations={locations} variant="header" />
+          <SearchBar
+            locations={locations}
+            variant="header"
+            onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
+          />
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
@@ -87,7 +93,11 @@ export function Header({
       </div>
 
       <div className="md:hidden border-t border-border/60 px-4 py-3">
-        <SearchBar locations={locations} variant="header" />
+        <SearchBar
+          locations={locations}
+          variant="header"
+          onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
+        />
       </div>
     </header>
   );
