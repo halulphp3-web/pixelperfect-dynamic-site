@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Curated holiday homes in Dubai — book with confidence" },
+      { name: "description", content: "Hand-picked apartments, villas, and studios across Dubai. Verified hosts, 24/7 support, easy check-in." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Curated holiday homes in Dubai — book with confidence" },
+      { property: "og:description", content: "Hand-picked apartments, villas, and studios across Dubai. Verified hosts, 24/7 support, easy check-in." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Curated holiday homes in Dubai — book with confidence" },
+      { name: "twitter:description", content: "Hand-picked apartments, villas, and studios across Dubai. Verified hosts, 24/7 support, easy check-in." },
+      { property: "og:image", content: "/hero-stays.jpg" },
+      { name: "twitter:image", content: "/hero-stays.jpg" },
     ],
     links: [
       {

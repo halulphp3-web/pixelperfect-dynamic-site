@@ -24,8 +24,8 @@ export const Route = createFileRoute("/")({
         content:
           "Hand-picked apartments, villas, and studios across Dubai. Verified hosts, 24/7 support, easy check-in.",
       },
-      { property: "og:title", content: "Curated holiday homes in Dubai" },
-      { property: "og:description", content: "Hand-picked apartments, villas and studios with verified hosts." },
+      { property: "og:title", content: "Curated holiday homes in Dubai — book with confidence" },
+      { property: "og:description", content: "Hand-picked apartments, villas, and studios across Dubai. Verified hosts, 24/7 support, easy check-in." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
       { property: "og:image", content: "/hero-stays.jpg" },
