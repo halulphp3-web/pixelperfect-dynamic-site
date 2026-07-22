@@ -149,18 +149,34 @@ function PropertyDetail() {
         </div>
 
         <aside className="lg:sticky lg:top-24 h-fit rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold">{formatPrice(Number(p.price_per_night), currency)}</span>
-            <span className="text-sm text-muted-foreground">/ night</span>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-primary">Best available rate</div>
+          <h3 className="mt-1 text-2xl font-bold">Reserve your stay</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Choose your dates to see live availability and pricing.
+          </p>
+
+          <div className="mt-5 space-y-3">
+            <div className="rounded-lg border border-border bg-background px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Check-in / Check-out</div>
+              <div className="mt-0.5 text-sm text-muted-foreground">📅 Choose the date</div>
+            </div>
+            <div className="rounded-lg border border-border bg-background px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Guests</div>
+              <div className="mt-0.5 text-sm">👥 {p.guests} guests</div>
+            </div>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Approximate — final quote confirmed by the host.</p>
+
+          <div className="mt-4 flex items-baseline gap-1">
+            <span className="text-2xl font-bold">{formatPrice(Number(p.price_per_night), currency)}</span>
+            <span className="text-xs text-muted-foreground">/ night · from</span>
+          </div>
 
           <Link
             to="/contact"
             search={{ property: p.slug } as any}
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
           >
-            Request availability <ArrowRight className="h-4 w-4" />
+            Check live availability <ArrowRight className="h-4 w-4" />
           </Link>
 
           {site.settings?.whatsapp && (
@@ -170,17 +186,15 @@ function PropertyDetail() {
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-border px-5 py-3 text-sm font-medium hover:bg-accent"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-5 py-3 text-sm font-semibold text-white hover:bg-green-700"
             >
-              Chat on WhatsApp
+              💬 Chat on WhatsApp
             </a>
           )}
 
-          <div className="mt-5 grid grid-cols-3 gap-3 text-center text-xs text-muted-foreground">
-            <div><div className="text-lg font-semibold text-foreground">{p.bedrooms}</div>Bedrooms</div>
-            <div><div className="text-lg font-semibold text-foreground">{p.bathrooms}</div>Bathrooms</div>
-            <div><div className="text-lg font-semibold text-foreground">{p.guests}</div>Guests</div>
-          </div>
+          <p className="mt-4 text-[11px] text-muted-foreground text-center">
+            🔒 Your booking request is handled securely.
+          </p>
         </aside>
       </section>
     </SiteLayout>
