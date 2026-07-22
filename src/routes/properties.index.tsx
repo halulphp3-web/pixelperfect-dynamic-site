@@ -14,7 +14,7 @@ const propsQuery = queryOptions({
   staleTime: 30_000,
 });
 
-export const Route = createFileRoute("/properties")({
+export const Route = createFileRoute("/properties/")({
   loader: ({ context }) =>
     Promise.all([
       context.queryClient.ensureQueryData(siteQuery),
