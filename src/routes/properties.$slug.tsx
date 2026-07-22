@@ -66,6 +66,25 @@ function PropertyDetail() {
   const amenities = (Array.isArray(p.amenities) ? (p.amenities as any[]) : []) as string[];
   const highlights = (Array.isArray(p.highlights) ? (p.highlights as any[]) : []) as string[];
 
+  const [range, setRange] = useState<DateRange | undefined>();
+  const [guests, setGuests] = useState<number>(p.guests ?? 2);
+  const [openDates, setOpenDates] = useState(false);
+  const [openGuests, setOpenGuests] = useState(false);
+  const [showAvailability, setShowAvailability] = useState(false);
+
+  const nights = range?.from && range?.to ? Math.max(0, differenceInCalendarDays(range.to, range.from)) : 0;
+  const pricePerNight = Number(p.price_per_night ?? 0);
+  const feesAed = 310;
+  const stayTotalAed = pricePerNight * nights + (nights > 0 ? feesAed : 0);
+  const sym = CURRENCY_SYMBOL[currency] ?? currency;
+  const fmt = (aed: number) => `${sym} ${new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(convertFromAED(aed, currency))}`;
+
+  const waNumber = site.settings?.whatsapp?.replace(/\D/g, "");
+  const waText = encodeURIComponent(
+    `Hi! I'd like to book ${p.title}${range?.from && range?.to ? ` from ${format(range.from, "yyyy-MM-dd")} to ${format(range.to, "yyyy-MM-dd")}` : ""} for ${guests} guest${guests === 1 ? "" : "s"}.`,
+  );
+
+
   return (
     <SiteLayout settings={site.settings} menu={site.menu}>
       <section className="mx-auto max-w-7xl px-4 md:px-6 pt-8">
