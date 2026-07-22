@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useSuspenseQuery, queryOptions, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import * as Icons from "lucide-react";
 import { ArrowRight, BedDouble, Bath, Users, MapPin, Quote, Star } from "lucide-react";
-import { getSiteData } from "@/lib/public-content.functions";
+import { getSiteData, listProperties } from "@/lib/public-content.functions";
 import { SiteLayout, useFlags } from "@/components/site/SiteLayout";
 import { SearchBar } from "@/components/site/SearchBar";
 import { useSite } from "@/lib/site-context";
@@ -12,6 +13,11 @@ const siteQuery = queryOptions({
   queryKey: ["site-data"],
   queryFn: () => getSiteData(),
   staleTime: 60_000,
+});
+const allPropsQuery = queryOptions({
+  queryKey: ["properties", "all"],
+  queryFn: () => listProperties({ data: {} }),
+  staleTime: 30_000,
 });
 
 export const Route = createFileRoute("/")({
