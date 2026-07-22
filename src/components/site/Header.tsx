@@ -97,13 +97,15 @@ export function Header({
         </div>
       </div>
 
-      <div className="md:hidden border-t border-border/60 px-4 py-3">
-        <SearchBar
-          locations={locations}
-          variant="header"
-          onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
-        />
-      </div>
+      {!hideSearch && (
+        <div className="md:hidden border-t border-border/60 px-4 py-3">
+          <SearchBar
+            locations={locations}
+            variant="header"
+            onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
+          />
+        </div>
+      )}
     </header>
   );
 }
