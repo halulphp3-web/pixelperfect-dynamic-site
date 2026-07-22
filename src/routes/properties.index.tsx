@@ -75,7 +75,7 @@ function PropertiesPage() {
   );
 
   return (
-    <SiteLayout settings={site.settings} menu={site.menu} locations={allLocations}>
+    <SiteLayout settings={site.settings} menu={site.menu} locations={allLocations} hideHeaderSearch>
       <section className="border-b border-border bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 md:px-6 pt-10 pb-8">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Find your next stay</h1>
