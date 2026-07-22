@@ -62,7 +62,7 @@ function Home() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
             <img
-              src="/hero-stays.jpg"
+              src={first?.image_url ?? "/hero-stays.jpg"}
               alt=""
               width={1920}
               height={1080}
