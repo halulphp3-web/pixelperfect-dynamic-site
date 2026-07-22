@@ -18,6 +18,16 @@ import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminTestimonialsRouteImport } from './routes/_authenticated/admin/testimonials'
+import { Route as AuthenticatedAdminStatsRouteImport } from './routes/_authenticated/admin/stats'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin/services'
+import { Route as AuthenticatedAdminPagesRouteImport } from './routes/_authenticated/admin/pages'
+import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated/admin/messages'
+import { Route as AuthenticatedAdminMenuRouteImport } from './routes/_authenticated/admin/menu'
+import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
+import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin/hero'
+import { Route as AuthenticatedAdminFeaturesRouteImport } from './routes/_authenticated/admin/features'
 
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
@@ -63,6 +73,61 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminTestimonialsRoute =
+  AuthenticatedAdminTestimonialsRouteImport.update({
+    id: '/testimonials',
+    path: '/testimonials',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminStatsRoute = AuthenticatedAdminStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminServicesRoute =
+  AuthenticatedAdminServicesRouteImport.update({
+    id: '/services',
+    path: '/services',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPagesRoute = AuthenticatedAdminPagesRouteImport.update({
+  id: '/pages',
+  path: '/pages',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminMessagesRoute =
+  AuthenticatedAdminMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminMenuRoute = AuthenticatedAdminMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminMediaRoute = AuthenticatedAdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminHeroRoute = AuthenticatedAdminHeroRouteImport.update({
+  id: '/hero',
+  path: '/hero',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminFeaturesRoute =
+  AuthenticatedAdminFeaturesRouteImport.update({
+    id: '/features',
+    path: '/features',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -72,6 +137,16 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/services/$slug': typeof ServicesSlugRoute
   '/services/': typeof ServicesIndexRoute
+  '/admin/features': typeof AuthenticatedAdminFeaturesRoute
+  '/admin/hero': typeof AuthenticatedAdminHeroRoute
+  '/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/admin/menu': typeof AuthenticatedAdminMenuRoute
+  '/admin/messages': typeof AuthenticatedAdminMessagesRoute
+  '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/services': typeof AuthenticatedAdminServicesRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/stats': typeof AuthenticatedAdminStatsRoute
+  '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -81,6 +156,16 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/services': typeof ServicesIndexRoute
+  '/admin/features': typeof AuthenticatedAdminFeaturesRoute
+  '/admin/hero': typeof AuthenticatedAdminHeroRoute
+  '/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/admin/menu': typeof AuthenticatedAdminMenuRoute
+  '/admin/messages': typeof AuthenticatedAdminMessagesRoute
+  '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/services': typeof AuthenticatedAdminServicesRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/stats': typeof AuthenticatedAdminStatsRoute
+  '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -93,6 +178,16 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/services/$slug': typeof ServicesSlugRoute
   '/services/': typeof ServicesIndexRoute
+  '/_authenticated/admin/features': typeof AuthenticatedAdminFeaturesRoute
+  '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
+  '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/_authenticated/admin/menu': typeof AuthenticatedAdminMenuRoute
+  '/_authenticated/admin/messages': typeof AuthenticatedAdminMessagesRoute
+  '/_authenticated/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/stats': typeof AuthenticatedAdminStatsRoute
+  '/_authenticated/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -105,6 +200,16 @@ export interface FileRouteTypes {
     | '/admin'
     | '/services/$slug'
     | '/services/'
+    | '/admin/features'
+    | '/admin/hero'
+    | '/admin/media'
+    | '/admin/menu'
+    | '/admin/messages'
+    | '/admin/pages'
+    | '/admin/services'
+    | '/admin/settings'
+    | '/admin/stats'
+    | '/admin/testimonials'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -114,6 +219,16 @@ export interface FileRouteTypes {
     | '/contact'
     | '/services/$slug'
     | '/services'
+    | '/admin/features'
+    | '/admin/hero'
+    | '/admin/media'
+    | '/admin/menu'
+    | '/admin/messages'
+    | '/admin/pages'
+    | '/admin/services'
+    | '/admin/settings'
+    | '/admin/stats'
+    | '/admin/testimonials'
     | '/admin'
   id:
     | '__root__'
@@ -125,6 +240,16 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/services/$slug'
     | '/services/'
+    | '/_authenticated/admin/features'
+    | '/_authenticated/admin/hero'
+    | '/_authenticated/admin/media'
+    | '/_authenticated/admin/menu'
+    | '/_authenticated/admin/messages'
+    | '/_authenticated/admin/pages'
+    | '/_authenticated/admin/services'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/stats'
+    | '/_authenticated/admin/testimonials'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -203,15 +328,105 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/testimonials': {
+      id: '/_authenticated/admin/testimonials'
+      path: '/testimonials'
+      fullPath: '/admin/testimonials'
+      preLoaderRoute: typeof AuthenticatedAdminTestimonialsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/stats': {
+      id: '/_authenticated/admin/stats'
+      path: '/stats'
+      fullPath: '/admin/stats'
+      preLoaderRoute: typeof AuthenticatedAdminStatsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/services': {
+      id: '/_authenticated/admin/services'
+      path: '/services'
+      fullPath: '/admin/services'
+      preLoaderRoute: typeof AuthenticatedAdminServicesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/pages': {
+      id: '/_authenticated/admin/pages'
+      path: '/pages'
+      fullPath: '/admin/pages'
+      preLoaderRoute: typeof AuthenticatedAdminPagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/messages': {
+      id: '/_authenticated/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AuthenticatedAdminMessagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/menu': {
+      id: '/_authenticated/admin/menu'
+      path: '/menu'
+      fullPath: '/admin/menu'
+      preLoaderRoute: typeof AuthenticatedAdminMenuRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/media': {
+      id: '/_authenticated/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AuthenticatedAdminMediaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/hero': {
+      id: '/_authenticated/admin/hero'
+      path: '/hero'
+      fullPath: '/admin/hero'
+      preLoaderRoute: typeof AuthenticatedAdminHeroRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/features': {
+      id: '/_authenticated/admin/features'
+      path: '/features'
+      fullPath: '/admin/features'
+      preLoaderRoute: typeof AuthenticatedAdminFeaturesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminFeaturesRoute: typeof AuthenticatedAdminFeaturesRoute
+  AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
+  AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
+  AuthenticatedAdminMenuRoute: typeof AuthenticatedAdminMenuRoute
+  AuthenticatedAdminMessagesRoute: typeof AuthenticatedAdminMessagesRoute
+  AuthenticatedAdminPagesRoute: typeof AuthenticatedAdminPagesRoute
+  AuthenticatedAdminServicesRoute: typeof AuthenticatedAdminServicesRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminStatsRoute: typeof AuthenticatedAdminStatsRoute
+  AuthenticatedAdminTestimonialsRoute: typeof AuthenticatedAdminTestimonialsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminFeaturesRoute: AuthenticatedAdminFeaturesRoute,
+    AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,
+    AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
+    AuthenticatedAdminMenuRoute: AuthenticatedAdminMenuRoute,
+    AuthenticatedAdminMessagesRoute: AuthenticatedAdminMessagesRoute,
+    AuthenticatedAdminPagesRoute: AuthenticatedAdminPagesRoute,
+    AuthenticatedAdminServicesRoute: AuthenticatedAdminServicesRoute,
+    AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+    AuthenticatedAdminStatsRoute: AuthenticatedAdminStatsRoute,
+    AuthenticatedAdminTestimonialsRoute: AuthenticatedAdminTestimonialsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
