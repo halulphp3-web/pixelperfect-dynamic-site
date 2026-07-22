@@ -14,12 +14,14 @@ export function Header({
   flags,
   locations = [],
   onSearch,
+  hideSearch = false,
 }: {
   settings: Settings;
   menu: MenuItem[];
   flags: FeatureFlags;
   locations?: string[];
   onSearch?: (v: { destination: string; guests: number }) => void;
+  hideSearch?: boolean;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const { currency, setCurrency, supportedCurrencies, lang, setLang, theme, toggleTheme } = useSite();
