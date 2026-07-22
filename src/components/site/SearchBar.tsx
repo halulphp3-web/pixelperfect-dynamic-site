@@ -177,7 +177,8 @@ export function SearchBar({
       <button
         type="button"
         onClick={submit}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90"
+        style={{ backgroundColor: "#c9a15a" }}
+        className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm hover:brightness-110 transition"
       >
         <Search className="h-4 w-4" /> Search
       </button>
