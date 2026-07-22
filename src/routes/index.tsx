@@ -50,15 +50,12 @@ function Home() {
   const { currency } = useSite();
 
   return (
-    <SiteLayout settings={settings} menu={menu}>
-      {/* TOP SEARCH BAR */}
-      <section className="border-b border-border bg-background">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 py-4">
-          <SearchBar
-            locations={featuredProperties.map((p) => p.location).filter(Boolean) as string[]}
-          />
-        </div>
-      </section>
+    <SiteLayout
+      settings={settings}
+      menu={menu}
+      locations={featuredProperties.map((p) => p.location).filter(Boolean) as string[]}
+    >
+
 
       {/* HERO */}
       {flags.home.hero && (

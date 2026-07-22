@@ -14,7 +14,7 @@ export function SearchBar({
 }: {
   locations?: string[];
   className?: string;
-  variant?: "solid" | "overlay";
+  variant?: "solid" | "overlay" | "header";
 }) {
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
@@ -30,9 +30,9 @@ export function SearchBar({
 
   const dateLabel = range?.from
     ? range.to
-      ? `${format(range.from, "MMM dd, yyyy")} → ${format(range.to, "MMM dd, yyyy")}`
+      ? `${format(range.from, "MMM dd")} → ${format(range.to, "MMM dd")}`
       : format(range.from, "MMM dd, yyyy")
-    : "Add dates";
+    : "Choose the date";
 
   const submit = () => {
     navigate({
@@ -43,28 +43,37 @@ export function SearchBar({
 
   const shell =
     variant === "overlay"
-      ? "bg-background/95 backdrop-blur-md shadow-2xl ring-1 ring-border"
-      : "bg-card border border-border shadow-sm";
+      ? "bg-background/95 backdrop-blur-md shadow-2xl ring-1 ring-border rounded-2xl p-2"
+      : variant === "header"
+      ? "bg-transparent rounded-xl p-0"
+      : "bg-card border border-border shadow-sm rounded-2xl p-2";
+
+  // white input cells (works in dark mode too since user asked white bg)
+  const cell =
+    "flex items-center gap-3 rounded-xl border border-border bg-white px-4 py-2.5 text-left text-slate-900 transition hover:border-primary/60";
 
   return (
     <div
       className={cn(
-        "w-full rounded-2xl p-2 grid gap-2 md:grid-cols-[1.4fr_1.6fr_1fr_auto] items-stretch",
+        "w-full grid gap-2 items-stretch",
+        variant === "header"
+          ? "grid-cols-1 md:grid-cols-[1.3fr_1.4fr_1fr_auto]"
+          : "md:grid-cols-[1.4fr_1.6fr_1fr_auto]",
         shell,
         className,
       )}
     >
       {/* Destination */}
-      <label className="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-accent/40 transition cursor-text">
+      <label className={cn(cell, "cursor-text")}>
         <MapPin className="h-4 w-4 text-primary shrink-0" />
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Destination</div>
+          <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Destination</div>
           <input
             list="sb-locations"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
             placeholder="Choose a location"
-            className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground"
+            className="w-full bg-transparent text-sm font-medium outline-none text-slate-900 placeholder:text-slate-400"
           />
           <datalist id="sb-locations">
             {uniqueLocations.map((l) => (
@@ -77,20 +86,17 @@ export function SearchBar({
       {/* Dates */}
       <Popover open={openDates} onOpenChange={setOpenDates}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="flex items-center gap-3 rounded-xl px-4 py-3 text-left hover:bg-accent/40 transition"
-          >
+          <button type="button" className={cell}>
             <CalendarDays className="h-4 w-4 text-primary shrink-0" />
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                 Check-in / Check-out
               </div>
               <div className="truncate text-sm font-medium">{dateLabel}</div>
             </div>
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+        <PopoverContent className="w-auto p-0 pointer-events-auto bg-white" align="start">
           <div className="p-2">
             <Calendar
               mode="range"
@@ -123,24 +129,21 @@ export function SearchBar({
       {/* Guests */}
       <Popover open={openGuests} onOpenChange={setOpenGuests}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="flex items-center gap-3 rounded-xl px-4 py-3 text-left hover:bg-accent/40 transition"
-          >
+          <button type="button" className={cell}>
             <Users className="h-4 w-4 text-primary shrink-0" />
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Guests</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Guests</div>
               <div className="truncate text-sm font-medium">
                 {guests} guest{guests === 1 ? "" : "s"}
               </div>
             </div>
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-3 pointer-events-auto" align="start">
+        <PopoverContent className="w-56 p-3 pointer-events-auto bg-white" align="start">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-semibold">Guests</div>
-              <div className="text-xs text-muted-foreground">Max 16</div>
+              <div className="text-sm font-semibold text-slate-900">Guests</div>
+              <div className="text-xs text-slate-500">Max 16</div>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -151,7 +154,7 @@ export function SearchBar({
               >
                 −
               </button>
-              <span className="w-6 text-center text-sm font-medium">{guests}</span>
+              <span className="w-6 text-center text-sm font-medium text-slate-900">{guests}</span>
               <button
                 type="button"
                 onClick={() => setGuests((g) => Math.min(16, g + 1))}

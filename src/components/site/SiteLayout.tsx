@@ -23,15 +23,17 @@ export function SiteLayout({
   settings,
   menu,
   children,
+  locations = [],
 }: {
   settings: Tables<"site_settings"> | null;
   menu: Tables<"menu_items">[];
   children: ReactNode;
+  locations?: string[];
 }) {
   const flags = mergeFlags(settings?.feature_flags as any);
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <Header settings={settings} menu={menu} flags={flags} />
+      <Header settings={settings} menu={menu} flags={flags} locations={locations} />
       <main className="flex-1">{children}</main>
       <Footer settings={settings} />
       <FloatingWidgets whatsapp={settings?.whatsapp} flags={flags} />
