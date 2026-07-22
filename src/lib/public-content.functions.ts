@@ -105,12 +105,20 @@ export const listProperties = createServerFn({ method: "GET" })
       .parse(v ?? {}),
   )
   .handler(async ({ data }): Promise<Tables<"properties">[]> => {
-    const sb = serverClient();
-    let q = sb.from("properties").select("*").eq("active", true).order("sort");
-    if (data.guests) q = q.gte("guests", data.guests);
-    if (data.search) q = q.or(`title.ilike.%${data.search}%,location.ilike.%${data.search}%,property_type.ilike.%${data.search}%`);
-    const { data: rows } = await q;
-    return JSON.parse(JSON.stringify(rows ?? []));
+    try {
+      const sb = serverClient();
+      let q = sb.from("properties").select("*").eq("active", true).order("sort");
+      if (data.guests) q = q.gte("guests", data.guests);
+      if (data.search) q = q.or(`title.ilike.%${data.search}%,location.ilike.%${data.search}%,property_type.ilike.%${data.search}%`);
+      const { data: rows, error } = await q;
+      if (error) { console.error("[listProperties] supabase error", error); throw new Error(error.message); }
+      const out = JSON.parse(JSON.stringify(rows ?? []));
+      console.log("[listProperties] rows=", out.length);
+      return out;
+    } catch (e: any) {
+      console.error("[listProperties] handler error", e?.message, e?.stack);
+      throw new Error(String(e?.message ?? e));
+    }
   });
 
 export const getPropertyBySlug = createServerFn({ method: "GET" })
