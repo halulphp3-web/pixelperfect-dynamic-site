@@ -48,7 +48,7 @@ type SiteData = {
 export const getSiteData = createServerFn({ method: "GET" }).handler(async (): Promise<SiteData> => {
   const sb = serverClient();
   const [settings, menu, hero, services, features, stats, testimonials, featured] = await Promise.all([
-    sb.from("site_settings").select("*").eq("id", 1).maybeSingle(),
+    sb.from("site_settings").select("id, site_name, tagline, logo_url, favicon_url, email, phone, whatsapp, address, google_map_embed, socials, default_currency, supported_currencies, seo, feature_flags, updated_at").eq("id", 1).maybeSingle(),
     sb.from("menu_items").select("*").eq("active", true).eq("location", "header").order("sort"),
     sb.from("hero_slides").select("*").eq("active", true).order("sort"),
     sb.from("services").select("*").eq("active", true).order("sort"),
