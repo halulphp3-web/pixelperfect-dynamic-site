@@ -43,6 +43,7 @@ const tableSchema = z.enum([
   "pages",
   "contact_messages",
   "media",
+  "properties",
 ]);
 
 export const listRows = createServerFn({ method: "GET" })

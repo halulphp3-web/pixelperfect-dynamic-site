@@ -19,9 +19,23 @@ function serverClient() {
   });
 }
 
+export type FeatureFlags = {
+  home: { hero: boolean; stats: boolean; services: boolean; features: boolean; properties: boolean; testimonials: boolean; cta: boolean };
+  header: { currency_switcher: boolean; language_switcher: boolean; dark_mode: boolean; search_bar: boolean };
+  widgets: { whatsapp: boolean; back_to_top: boolean; ai_chat: boolean };
+  properties_page: { map: boolean; filters: boolean };
+};
+
+export const DEFAULT_FLAGS: FeatureFlags = {
+  home: { hero: true, stats: true, services: true, features: true, properties: true, testimonials: true, cta: true },
+  header: { currency_switcher: true, language_switcher: true, dark_mode: true, search_bar: false },
+  widgets: { whatsapp: true, back_to_top: true, ai_chat: false },
+  properties_page: { map: true, filters: true },
+};
+
 export const getSiteData = createServerFn({ method: "GET" }).handler(async () => {
   const sb = serverClient();
-  const [settings, menu, hero, services, features, stats, testimonials] = await Promise.all([
+  const [settings, menu, hero, services, features, stats, testimonials, featured] = await Promise.all([
     sb.from("site_settings").select("*").eq("id", 1).maybeSingle(),
     sb.from("menu_items").select("*").eq("active", true).eq("location", "header").order("sort"),
     sb.from("hero_slides").select("*").eq("active", true).order("sort"),
@@ -29,6 +43,7 @@ export const getSiteData = createServerFn({ method: "GET" }).handler(async () =>
     sb.from("features").select("*").eq("active", true).order("sort"),
     sb.from("stats").select("*").eq("active", true).order("sort"),
     sb.from("testimonials").select("*").eq("active", true).order("sort"),
+    sb.from("properties").select("*").eq("active", true).eq("featured", true).order("sort").limit(6),
   ]);
   return {
     settings: settings.data,
@@ -38,6 +53,7 @@ export const getSiteData = createServerFn({ method: "GET" }).handler(async () =>
     features: features.data ?? [],
     stats: stats.data ?? [],
     testimonials: testimonials.data ?? [],
+    featuredProperties: featured.data ?? [],
   };
 });
 
@@ -65,6 +81,37 @@ export const getPageBySlug = createServerFn({ method: "GET" })
       .eq("status", "published")
       .maybeSingle();
     return page;
+  });
+
+export const listProperties = createServerFn({ method: "GET" })
+  .inputValidator((v) =>
+    z
+      .object({
+        search: z.string().trim().max(120).optional().or(z.literal("")),
+        guests: z.number().int().min(1).max(30).optional(),
+      })
+      .parse(v ?? {}),
+  )
+  .handler(async ({ data }) => {
+    const sb = serverClient();
+    let q = sb.from("properties").select("*").eq("active", true).order("sort");
+    if (data.guests) q = q.gte("guests", data.guests);
+    if (data.search) q = q.or(`title.ilike.%${data.search}%,location.ilike.%${data.search}%,property_type.ilike.%${data.search}%`);
+    const { data: rows } = await q;
+    return rows ?? [];
+  });
+
+export const getPropertyBySlug = createServerFn({ method: "GET" })
+  .inputValidator((v) => z.object({ slug: z.string() }).parse(v))
+  .handler(async ({ data }) => {
+    const sb = serverClient();
+    const { data: prop } = await sb
+      .from("properties")
+      .select("*")
+      .eq("slug", data.slug)
+      .eq("active", true)
+      .maybeSingle();
+    return prop;
   });
 
 export const submitContactMessage = createServerFn({ method: "POST" })

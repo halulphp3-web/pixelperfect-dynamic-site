@@ -15,13 +15,16 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
+import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
+import { Route as PropertiesSlugRouteImport } from './routes/properties.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminTestimonialsRouteImport } from './routes/_authenticated/admin/testimonials'
 import { Route as AuthenticatedAdminStatsRouteImport } from './routes/_authenticated/admin/stats'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin/services'
+import { Route as AuthenticatedAdminPropertiesRouteImport } from './routes/_authenticated/admin/properties'
 import { Route as AuthenticatedAdminPagesRouteImport } from './routes/_authenticated/admin/pages'
 import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated/admin/messages'
 import { Route as AuthenticatedAdminMenuRouteImport } from './routes/_authenticated/admin/menu'
@@ -58,9 +61,19 @@ const ServicesIndexRoute = ServicesIndexRouteImport.update({
   path: '/services/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PropertiesIndexRoute = PropertiesIndexRouteImport.update({
+  id: '/properties/',
+  path: '/properties/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
   id: '/services/$slug',
   path: '/services/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertiesSlugRoute = PropertiesSlugRouteImport.update({
+  id: '/properties/$slug',
+  path: '/properties/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -94,6 +107,12 @@ const AuthenticatedAdminServicesRoute =
   AuthenticatedAdminServicesRouteImport.update({
     id: '/services',
     path: '/services',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPropertiesRoute =
+  AuthenticatedAdminPropertiesRouteImport.update({
+    id: '/properties',
+    path: '/properties',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminPagesRoute = AuthenticatedAdminPagesRouteImport.update({
@@ -135,7 +154,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/properties/$slug': typeof PropertiesSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/properties/': typeof PropertiesIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/admin/features': typeof AuthenticatedAdminFeaturesRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -143,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/properties': typeof AuthenticatedAdminPropertiesRoute
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/stats': typeof AuthenticatedAdminStatsRoute
@@ -154,7 +176,9 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/properties/$slug': typeof PropertiesSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/properties': typeof PropertiesIndexRoute
   '/services': typeof ServicesIndexRoute
   '/admin/features': typeof AuthenticatedAdminFeaturesRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -162,6 +186,7 @@ export interface FileRoutesByTo {
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/properties': typeof AuthenticatedAdminPropertiesRoute
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/stats': typeof AuthenticatedAdminStatsRoute
@@ -176,7 +201,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/properties/$slug': typeof PropertiesSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/properties/': typeof PropertiesIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/_authenticated/admin/features': typeof AuthenticatedAdminFeaturesRoute
   '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -184,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/_authenticated/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/_authenticated/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/_authenticated/admin/properties': typeof AuthenticatedAdminPropertiesRoute
   '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/stats': typeof AuthenticatedAdminStatsRoute
@@ -198,7 +226,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/admin'
+    | '/properties/$slug'
     | '/services/$slug'
+    | '/properties/'
     | '/services/'
     | '/admin/features'
     | '/admin/hero'
@@ -206,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/menu'
     | '/admin/messages'
     | '/admin/pages'
+    | '/admin/properties'
     | '/admin/services'
     | '/admin/settings'
     | '/admin/stats'
@@ -217,7 +248,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/properties/$slug'
     | '/services/$slug'
+    | '/properties'
     | '/services'
     | '/admin/features'
     | '/admin/hero'
@@ -225,6 +258,7 @@ export interface FileRouteTypes {
     | '/admin/menu'
     | '/admin/messages'
     | '/admin/pages'
+    | '/admin/properties'
     | '/admin/services'
     | '/admin/settings'
     | '/admin/stats'
@@ -238,7 +272,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/_authenticated/admin'
+    | '/properties/$slug'
     | '/services/$slug'
+    | '/properties/'
     | '/services/'
     | '/_authenticated/admin/features'
     | '/_authenticated/admin/hero'
@@ -246,6 +282,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/menu'
     | '/_authenticated/admin/messages'
     | '/_authenticated/admin/pages'
+    | '/_authenticated/admin/properties'
     | '/_authenticated/admin/services'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/stats'
@@ -259,7 +296,9 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  PropertiesSlugRoute: typeof PropertiesSlugRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
+  PropertiesIndexRoute: typeof PropertiesIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
 }
 
@@ -307,11 +346,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/properties/': {
+      id: '/properties/'
+      path: '/properties'
+      fullPath: '/properties/'
+      preLoaderRoute: typeof PropertiesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/$slug': {
       id: '/services/$slug'
       path: '/services/$slug'
       fullPath: '/services/$slug'
       preLoaderRoute: typeof ServicesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/properties/$slug': {
+      id: '/properties/$slug'
+      path: '/properties/$slug'
+      fullPath: '/properties/$slug'
+      preLoaderRoute: typeof PropertiesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -354,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/admin/services'
       preLoaderRoute: typeof AuthenticatedAdminServicesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/properties': {
+      id: '/_authenticated/admin/properties'
+      path: '/properties'
+      fullPath: '/admin/properties'
+      preLoaderRoute: typeof AuthenticatedAdminPropertiesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/pages': {
@@ -408,6 +468,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminMenuRoute: typeof AuthenticatedAdminMenuRoute
   AuthenticatedAdminMessagesRoute: typeof AuthenticatedAdminMessagesRoute
   AuthenticatedAdminPagesRoute: typeof AuthenticatedAdminPagesRoute
+  AuthenticatedAdminPropertiesRoute: typeof AuthenticatedAdminPropertiesRoute
   AuthenticatedAdminServicesRoute: typeof AuthenticatedAdminServicesRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminStatsRoute: typeof AuthenticatedAdminStatsRoute
@@ -423,6 +484,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminMenuRoute: AuthenticatedAdminMenuRoute,
     AuthenticatedAdminMessagesRoute: AuthenticatedAdminMessagesRoute,
     AuthenticatedAdminPagesRoute: AuthenticatedAdminPagesRoute,
+    AuthenticatedAdminPropertiesRoute: AuthenticatedAdminPropertiesRoute,
     AuthenticatedAdminServicesRoute: AuthenticatedAdminServicesRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminStatsRoute: AuthenticatedAdminStatsRoute,
@@ -452,7 +514,9 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  PropertiesSlugRoute: PropertiesSlugRoute,
   ServicesSlugRoute: ServicesSlugRoute,
+  PropertiesIndexRoute: PropertiesIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
 }
 export const routeTree = rootRouteImport
