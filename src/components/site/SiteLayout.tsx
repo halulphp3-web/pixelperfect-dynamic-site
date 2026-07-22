@@ -25,17 +25,19 @@ export function SiteLayout({
   children,
   locations = [],
   onHeaderSearch,
+  hideHeaderSearch = false,
 }: {
   settings: Tables<"site_settings"> | null;
   menu: Tables<"menu_items">[];
   children: ReactNode;
   locations?: string[];
   onHeaderSearch?: (v: { destination: string; guests: number }) => void;
+  hideHeaderSearch?: boolean;
 }) {
   const flags = mergeFlags(settings?.feature_flags as any);
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <Header settings={settings} menu={menu} flags={flags} locations={locations} onSearch={onHeaderSearch} />
+      <Header settings={settings} menu={menu} flags={flags} locations={locations} onSearch={onHeaderSearch} hideSearch={hideHeaderSearch} />
       <main className="flex-1">{children}</main>
       <Footer settings={settings} />
       <FloatingWidgets whatsapp={settings?.whatsapp} flags={flags} />
