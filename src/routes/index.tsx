@@ -54,13 +54,86 @@ function Home() {
   const flags = useFlags(settings);
   const first = hero[0];
   const { currency } = useSite();
+  const { data: allProps = [] } = useQuery(allPropsQuery);
+  const [filter, setFilter] = useState<{ destination: string; guests: number } | null>(null);
+
+  const results = filter
+    ? allProps.filter((p) => {
+        if (filter.guests && p.guests < filter.guests) return false;
+        if (filter.destination) {
+          const s = filter.destination.toLowerCase();
+          const hay = `${p.title} ${p.location ?? ""} ${p.property_type ?? ""}`.toLowerCase();
+          if (!hay.includes(s)) return false;
+        }
+        return true;
+      })
+    : [];
+
+  const allLocations = (allProps.length ? allProps : featuredProperties)
+    .map((p) => p.location)
+    .filter(Boolean) as string[];
 
   return (
     <SiteLayout
       settings={settings}
       menu={menu}
-      locations={featuredProperties.map((p) => p.location).filter(Boolean) as string[]}
+      locations={allLocations}
+      onHeaderSearch={(v) => {
+        setFilter({ destination: v.destination, guests: v.guests });
+        setTimeout(() => document.getElementById("home-results")?.scrollIntoView({ behavior: "smooth" }), 50);
+      }}
     >
+      {filter && (
+        <section id="home-results" className="mx-auto max-w-7xl px-4 md:px-6 pt-10">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Search results</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {results.length} stay{results.length === 1 ? "" : "s"} match your search.
+              </p>
+            </div>
+            <button
+              onClick={() => setFilter(null)}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map((p) => (
+              <Link
+                key={p.id}
+                to="/properties/$slug"
+                params={{ slug: p.slug }}
+                className="group overflow-hidden rounded-2xl border border-border bg-card hover:shadow-lg transition"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  {p.cover_image_url && (
+                    <img src={p.cover_image_url} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  )}
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5" /> {p.location}
+                  </div>
+                  <div className="mt-1.5 font-semibold line-clamp-1">{p.title}</div>
+                  <div className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.summary}</div>
+                  <div className="mt-3 text-lg font-bold">
+                    {formatPrice(Number(p.price_per_night), currency)}
+                    <span className="text-xs font-normal text-muted-foreground"> / night</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {results.length === 0 && (
+              <div className="col-span-full rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
+                No stays match. Try different filters.
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
 
 
       {/* HERO */}
