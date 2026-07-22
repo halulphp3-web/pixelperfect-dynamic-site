@@ -51,13 +51,16 @@ export function Header({
           <span className="hidden sm:inline whitespace-nowrap">{settings?.site_name ?? "Stays"}</span>
         </Link>
 
-        <div className="flex-1 min-w-0 hidden md:block">
-          <SearchBar
-            locations={locations}
-            variant="header"
-            onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
-          />
-        </div>
+        {!hideSearch && (
+          <div className="flex-1 min-w-0 hidden md:block">
+            <SearchBar
+              locations={locations}
+              variant="header"
+              onSubmit={onSearch ? (v) => onSearch({ destination: v.destination, guests: v.guests }) : undefined}
+            />
+          </div>
+        )}
+        {hideSearch && <div className="flex-1" />}
 
         <div className="flex shrink-0 items-center gap-2">
           {flags.header.currency_switcher && (
