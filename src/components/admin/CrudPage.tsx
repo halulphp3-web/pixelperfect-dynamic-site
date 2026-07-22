@@ -2,10 +2,12 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteRow, listRows, upsertRow } from "@/lib/admin.functions";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ImageUploadField } from "./ImageUploadField";
 
 export type FieldDef =
-  | { key: string; label: string; type: "text" | "number" | "url" | "textarea" | "boolean" }
+  | { key: string; label: string; type: "text" | "number" | "url" | "textarea" | "boolean" | "image" | "images" }
   | { key: string; label: string; type: "select"; options: { label: string; value: string }[] };
+
 
 export function CrudPage({
   title, table, fields, searchKeys = ["title", "name", "label", "heading"],
@@ -142,6 +144,12 @@ function EditModal({
                   />
                   Enabled
                 </label>
+              ) : f.type === "image" || f.type === "images" ? (
+                <ImageUploadField
+                  value={form[f.key]}
+                  multiple={f.type === "images"}
+                  onChange={(v) => setForm({ ...form, [f.key]: v })}
+                />
               ) : f.type === "select" ? (
                 <select
                   value={form[f.key] ?? ""}
