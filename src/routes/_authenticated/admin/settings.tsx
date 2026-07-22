@@ -1,0 +1,125 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { updateSettings } from "@/lib/admin.functions";
+
+export const Route = createFileRoute("/_authenticated/admin/settings")({
+  component: SettingsPage,
+});
+
+function SettingsPage() {
+  const qc = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
+      return data;
+    },
+  });
+  const [form, setForm] = useState<any>({});
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (data) setForm(data);
+  }, [data]);
+
+  const socials = form.socials ?? {};
+  const seo = form.seo ?? {};
+  const scripts = form.scripts ?? {};
+
+  function set(k: string, v: any) { setForm({ ...form, [k]: v }); }
+  function setSocial(k: string, v: string) { setForm({ ...form, socials: { ...socials, [k]: v } }); }
+  function setSeo(k: string, v: string) { setForm({ ...form, seo: { ...seo, [k]: v } }); }
+  function setScript(k: string, v: string) { setForm({ ...form, scripts: { ...scripts, [k]: v } }); }
+
+  async function save() {
+    const { id: _id, updated_at: _u, ...payload } = form;
+    await updateSettings({ data: payload });
+    qc.invalidateQueries({ queryKey: ["settings"] });
+    qc.invalidateQueries({ queryKey: ["site-data"] });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  return (
+    <div className="max-w-3xl">
+      <h1 className="text-2xl font-bold">Website Settings</h1>
+      <p className="text-sm text-muted-foreground">Global site information used across every page.</p>
+
+      <Section title="Brand">
+        <Field label="Site Name" value={form.site_name} onChange={(v) => set("site_name", v)} />
+        <Field label="Tagline" value={form.tagline} onChange={(v) => set("tagline", v)} />
+        <Field label="Logo URL" value={form.logo_url} onChange={(v) => set("logo_url", v)} />
+        <Field label="Favicon URL" value={form.favicon_url} onChange={(v) => set("favicon_url", v)} />
+      </Section>
+
+      <Section title="Contact">
+        <Field label="Email" value={form.email} onChange={(v) => set("email", v)} />
+        <Field label="Phone" value={form.phone} onChange={(v) => set("phone", v)} />
+        <Field label="WhatsApp Number (digits only)" value={form.whatsapp} onChange={(v) => set("whatsapp", v)} />
+        <Field label="Address" value={form.address} onChange={(v) => set("address", v)} textarea />
+        <Field label="Google Map Embed URL" value={form.google_map_embed} onChange={(v) => set("google_map_embed", v)} />
+      </Section>
+
+      <Section title="Social">
+        <Field label="Facebook URL" value={socials.facebook} onChange={(v) => setSocial("facebook", v)} />
+        <Field label="Instagram URL" value={socials.instagram} onChange={(v) => setSocial("instagram", v)} />
+        <Field label="LinkedIn URL" value={socials.linkedin} onChange={(v) => setSocial("linkedin", v)} />
+        <Field label="Twitter URL" value={socials.twitter} onChange={(v) => setSocial("twitter", v)} />
+      </Section>
+
+      <Section title="SEO Defaults">
+        <Field label="Meta Title" value={seo.meta_title} onChange={(v) => setSeo("meta_title", v)} />
+        <Field label="Meta Description" value={seo.meta_description} onChange={(v) => setSeo("meta_description", v)} textarea />
+        <Field label="Meta Keywords" value={seo.meta_keywords} onChange={(v) => setSeo("meta_keywords", v)} />
+      </Section>
+
+      <Section title="Analytics & Scripts">
+        <Field label="Google Analytics ID" value={scripts.ga_id} onChange={(v) => setScript("ga_id", v)} />
+        <Field label="Google Tag Manager ID" value={scripts.gtm_id} onChange={(v) => setScript("gtm_id", v)} />
+        <Field label="Facebook Pixel ID" value={scripts.fb_pixel} onChange={(v) => setScript("fb_pixel", v)} />
+        <Field label="Custom Header Scripts" value={scripts.head} onChange={(v) => setScript("head", v)} textarea />
+        <Field label="Custom Footer Scripts" value={scripts.body} onChange={(v) => setScript("body", v)} textarea />
+      </Section>
+
+      <div className="mt-8 flex items-center gap-3">
+        <button onClick={save} className="rounded-md bg-primary px-5 py-2 text-sm text-primary-foreground">Save changes</button>
+        {saved && <span className="text-sm text-green-600">Saved.</span>}
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-8 rounded-xl border border-border bg-card p-6">
+      <div className="text-lg font-semibold">{title}</div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">{children}</div>
+    </div>
+  );
+}
+
+function Field({
+  label, value, onChange, textarea,
+}: { label: string; value: any; onChange: (v: string) => void; textarea?: boolean }) {
+  return (
+    <label className="block sm:col-span-1 last:sm:col-span-2">
+      <span className="block text-sm font-medium mb-1">{label}</span>
+      {textarea ? (
+        <textarea
+          rows={3}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        />
+      ) : (
+        <input
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        />
+      )}
+    </label>
+  );
+}
