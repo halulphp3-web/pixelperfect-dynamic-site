@@ -8,7 +8,7 @@ export function Footer({ settings }: { settings: Settings }) {
   const socials = (settings?.socials ?? {}) as Record<string, string>;
   const whatsapp = settings?.whatsapp;
   return (
-    <footer className="mt-24 bg-slate-950 text-slate-200">
+    <footer className="mt-24 bg-black text-slate-200">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-16 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-1">
           <div className="text-xl font-bold text-white">{settings?.site_name}</div>
@@ -74,7 +74,7 @@ export function Footer({ settings }: { settings: Settings }) {
           </div>
         </div>
       </div>
-      <div className="border-t border-slate-800">
+      <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 md:px-6 py-5 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
           <span>© {new Date().getFullYear()} {settings?.site_name}. All rights reserved.</span>
           <Link to="/admin" className="hover:text-white transition">Admin</Link>

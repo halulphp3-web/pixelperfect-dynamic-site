@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/admin/hero")({
         { key: "subheading", label: "Subheading", type: "textarea" },
         { key: "cta_label", label: "CTA Label", type: "text" },
         { key: "cta_url", label: "CTA URL", type: "text" },
-        { key: "image_url", label: "Image URL", type: "url" },
+        { key: "image_url", label: "Banner image", type: "image" },
         { key: "sort", label: "Sort", type: "number" },
         { key: "active", label: "Active", type: "boolean" },
       ]}
