@@ -153,18 +153,12 @@ function PropertiesPage() {
 
           {flags.properties_page.map && (
             <aside className="hidden lg:block sticky top-24 h-[calc(100vh-8rem)] rounded-2xl border border-border bg-muted/40 overflow-hidden">
-              <div className="grid h-full place-items-center p-6 text-center text-sm text-muted-foreground">
-                <div>
-                  <MapPin className="mx-auto h-8 w-8 text-primary/60" />
-                  <div className="mt-3 font-semibold text-foreground">Map view</div>
-                  <p className="mt-2">Interactive map is coming soon. Toggle this panel off from the admin panel.</p>
-                  <ul className="mt-4 space-y-1 text-left">
-                    {filtered.slice(0, 6).map((p) => (
-                      <li key={p.id} className="text-xs">📍 {p.title} — {p.location}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              <MapEmbed
+                points={filtered
+                  .map((p) => ({ lat: Number(p.lat), lng: Number(p.lng) }))
+                  .filter((pt) => Number.isFinite(pt.lat) && Number.isFinite(pt.lng))}
+                height={Number.NaN as unknown as number}
+              />
             </aside>
           )}
         </div>
