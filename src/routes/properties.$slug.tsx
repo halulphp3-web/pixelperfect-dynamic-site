@@ -127,21 +127,30 @@ function PropertyDetail() {
 
       <section className="mx-auto max-w-7xl px-4 md:px-6 mt-6">
         <div className="grid gap-3 md:grid-cols-4 md:grid-rows-2 md:h-[480px]">
-          <div className="md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl bg-muted">
+          <button
+            type="button"
+            onClick={() => setLightboxIndex(0)}
+            className="md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl bg-muted text-left"
+          >
             {p.cover_image_url && (
               <img
                 src={p.cover_image_url}
                 alt={p.title}
                 width={1600}
                 height={1067}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
               />
             )}
-          </div>
+          </button>
           {gallery.slice(0, 4).map((src, i) => (
-            <div key={i} className="hidden md:block overflow-hidden rounded-2xl bg-muted">
-              <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
-            </div>
+            <button
+              key={i}
+              type="button"
+              onClick={() => setLightboxIndex(i + 1)}
+              className="hidden md:block overflow-hidden rounded-2xl bg-muted"
+            >
+              <img src={src} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+            </button>
           ))}
         </div>
       </section>
