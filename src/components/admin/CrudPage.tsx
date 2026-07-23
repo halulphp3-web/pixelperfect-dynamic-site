@@ -121,8 +121,8 @@ function EditModal({
 }: { fields: FieldDef[]; row: any; onCancel: () => void; onSave: (r: any) => void }) {
   const [form, setForm] = useState<any>(row);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-      <div className="w-full max-w-2xl rounded-xl bg-background border border-border p-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-xl bg-card text-card-foreground border border-border shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-bold">{row.id ? "Edit" : "New"}</h2>
         <div className="mt-4 space-y-4">
           {fields.map((f) => (
