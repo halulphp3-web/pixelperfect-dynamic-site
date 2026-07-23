@@ -53,6 +53,7 @@ function PropertiesPage() {
   const { search: qSearch, guests: qGuests } = Route.useSearch();
 
   const [type, setType] = useState<string>("");
+  const [hoverId, setHoverId] = useState<string | null>(null);
   const search = qSearch ?? "";
   const guests = qGuests ?? 0;
 
