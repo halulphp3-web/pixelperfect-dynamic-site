@@ -37,8 +37,14 @@ export function ImageUploadField({
           .from("property-images")
           .upload(path, file, { cacheControl: "3600", upsert: false });
         if (upErr) throw upErr;
-        const { data } = supabase.storage.from("property-images").getPublicUrl(path);
-        uploaded.push(data.publicUrl);
+        // Bucket is private (workspace policy blocks public buckets); use a
+        // long-lived signed URL so images render on the public site.
+        const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+        const { data: signed, error: signErr } = await supabase.storage
+          .from("property-images")
+          .createSignedUrl(path, TEN_YEARS);
+        if (signErr) throw signErr;
+        uploaded.push(signed.signedUrl);
       }
       if (multiple) onChange([...urls, ...uploaded]);
       else onChange(uploaded[0]);
