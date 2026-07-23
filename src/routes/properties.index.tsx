@@ -172,6 +172,7 @@ function PropertiesPage() {
                       location: p.location,
                     }))}
                     currency={currency}
+                    activeId={hoverId}
                     height="100%"
                   />
                 </Suspense>
