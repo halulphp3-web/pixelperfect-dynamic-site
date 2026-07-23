@@ -20,14 +20,18 @@ export function PropertyMap({
   properties,
   currency = "AED",
   height = "100%",
+  activeId = null,
 }: {
   properties: MapProperty[];
   currency?: string;
   height?: number | string;
+  activeId?: string | null;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const popupRootsRef = useRef<Root[]>([]);
+  const markersRef = useRef<Record<string, L.Marker>>({});
+  const setHoverRef = useRef<Record<string, (on: boolean) => void>>({});
 
   const valid = properties.filter(
     (p) => Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)),
@@ -66,6 +70,8 @@ export function PropertyMap({
       try { r.unmount(); } catch {}
     });
     popupRootsRef.current = [];
+    markersRef.current = {};
+    setHoverRef.current = {};
 
     if (valid.length === 0) return;
 
@@ -82,6 +88,7 @@ export function PropertyMap({
         iconAnchor: [32, 15],
       });
       const marker = L.marker([lat, lng], { icon }).addTo(map);
+      markersRef.current[p.id] = marker;
       const setHover = (on: boolean) => {
         const el = marker.getElement();
         if (!el) return;
@@ -96,6 +103,7 @@ export function PropertyMap({
         if (label) label.style.display = on ? "none" : "inline";
         if (name) name.style.display = on ? "inline-block" : "none";
       };
+      setHoverRef.current[p.id] = setHover;
       marker.on("mouseover", () => { setHover(true); marker.openPopup(); });
       marker.on("mouseout", () => { setHover(false); });
 
@@ -137,6 +145,15 @@ export function PropertyMap({
       map.fitBounds(bounds.pad(0.2));
     }
   }, [JSON.stringify(valid.map((p) => [p.id, p.lat, p.lng])), currency]);
+
+  useEffect(() => {
+    Object.entries(setHoverRef.current).forEach(([id, fn]) => {
+      fn(id === activeId);
+    });
+    if (activeId && markersRef.current[activeId]) {
+      markersRef.current[activeId].openPopup();
+    }
+  }, [activeId]);
 
   if (valid.length === 0) {
     return (

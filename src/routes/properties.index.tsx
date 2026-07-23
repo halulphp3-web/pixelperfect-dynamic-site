@@ -53,6 +53,7 @@ function PropertiesPage() {
   const { search: qSearch, guests: qGuests } = Route.useSearch();
 
   const [type, setType] = useState<string>("");
+  const [hoverId, setHoverId] = useState<string | null>(null);
   const search = qSearch ?? "";
   const guests = qGuests ?? 0;
 
@@ -112,6 +113,8 @@ function PropertiesPage() {
                 key={p.id}
                 to="/properties/$slug"
                 params={{ slug: p.slug }}
+                onMouseEnter={() => setHoverId(p.id)}
+                onMouseLeave={() => setHoverId((cur) => (cur === p.id ? null : cur))}
                 className="group overflow-hidden rounded-2xl border border-border bg-card hover:shadow-lg transition"
               >
                 <div className="aspect-[4/3] overflow-hidden bg-muted">
@@ -169,6 +172,7 @@ function PropertiesPage() {
                       location: p.location,
                     }))}
                     currency={currency}
+                    activeId={hoverId}
                     height="100%"
                   />
                 </Suspense>

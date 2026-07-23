@@ -1,27 +1,23 @@
 ## Goal
-Replace the current OpenStreetMap iframe on the properties listing page with an interactive map that shows a "View" pill marker for each property, matching the reference.
+When the user hovers a property card in the listing grid, the corresponding marker on the map should highlight and expand to show that property's name (same hover state that currently activates when hovering the marker directly).
 
 ## Changes
 
-**1. New component: `src/components/site/PropertyMap.tsx`**
-- Client-only Leaflet map (dynamic import behind `ClientOnly`/`useEffect` to avoid SSR issues — Leaflet touches `window`).
-- Props: `properties` (id, slug, title, lat, lng, price, cover_image_url).
-- Custom `L.divIcon` renders a white rounded "View" pill (shadcn styling, subtle shadow) as the marker.
-- On marker click: open a Leaflet popup with property title (+ small thumbnail/price) and a link to `/properties/$slug`.
-- Auto-fit bounds to all markers; fallback to Dubai center when no coords.
-- OSM tile layer; zoom controls top-left; scroll-wheel zoom enabled.
+**1. `src/components/site/PropertyMap.tsx`**
+- Accept a new prop `activeId?: string | null`.
+- Keep a `markersRef` map of `{ [propertyId]: L.Marker }` so we can address markers by id.
+- Extract the hover styling logic into a helper that toggles the dark pill + name on a given marker element.
+- Add an effect that watches `activeId`: when it changes, apply the hover style + `openPopup()` on the matching marker, and reset all others.
 
-**2. Dependency**
-- Add `leaflet` and `@types/leaflet`. Import `leaflet/dist/leaflet.css` in the component.
+**2. `src/routes/properties.index.tsx`**
+- Add `const [hoverId, setHoverId] = useState<string | null>(null)`.
+- On each property card `<Link>`, add `onMouseEnter={() => setHoverId(p.id)}` and `onMouseLeave={() => setHoverId(null)}`.
+- Pass `activeId={hoverId}` to `<PropertyMap ... />`.
 
-**3. `src/routes/properties.index.tsx`**
-- Swap `MapEmbed` for `PropertyMap` in the right-hand aside; pass filtered properties.
-- Keep `MapEmbed` in place for the detail page (unchanged).
-
-**4. Leave untouched**
-- `MapEmbed.tsx`, detail page map, gallery lightbox, filters, search, admin.
+## Leave untouched
+- Marker mouseover/mouseout behavior (still works when hovering the map).
+- Popup content, bounds fitting, filtering, SSR/lazy wrapping.
 
 ## Technical notes
-- Leaflet must not run in SSR. Wrap with a `useEffect` mount + `ClientOnly` gate, or `React.lazy` + `<ClientOnly>`.
-- Marker pill via `L.divIcon({ html: '<div class="...">View</div>', className: '' })` so Tailwind classes apply.
-- Bounds: `L.latLngBounds(points).pad(0.15)`; if 1 point, `setView` with zoom ~13.
+- Guard against markers being recreated: rebuild `markersRef` inside the same effect that creates markers, and re-run the `activeId` effect when the marker set changes.
+- Do not pan/zoom on hover — just style + open popup — to avoid disorienting the user while scanning the grid.
