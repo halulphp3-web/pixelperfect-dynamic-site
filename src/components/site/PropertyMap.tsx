@@ -70,6 +70,8 @@ export function PropertyMap({
       try { r.unmount(); } catch {}
     });
     popupRootsRef.current = [];
+    markersRef.current = {};
+    setHoverRef.current = {};
 
     if (valid.length === 0) return;
 
