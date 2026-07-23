@@ -68,6 +68,7 @@ export const Route = createFileRoute("/properties/$slug")({
 
 function PropertyDetail() {
   const { data: site } = useSuspenseQuery(siteQuery);
+  const { data: allProps } = useSuspenseQuery(propsListQuery);
   const p = Route.useLoaderData();
   const { currency } = useSite();
   const toList = (v: any): string[] => {
