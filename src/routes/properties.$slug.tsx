@@ -204,6 +204,20 @@ function PropertyDetail() {
               </div>
             </div>
           </div>
+
+          <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">Location</h2>
+              {p.location && (
+                <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4" /> {p.location}
+                </span>
+              )}
+            </div>
+            <div className="mt-4">
+              <MapEmbed points={[{ lat: Number(p.lat), lng: Number(p.lng) }]} height={360} />
+            </div>
+          </div>
         </div>
 
         <aside className="lg:sticky lg:top-24 h-fit rounded-2xl border border-border bg-card p-6 shadow-sm">
