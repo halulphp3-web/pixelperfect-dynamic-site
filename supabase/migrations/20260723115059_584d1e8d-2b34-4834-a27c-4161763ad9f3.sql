@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone can view buckets" ON storage.buckets FOR SELECT TO anon, authenticated USING (true);
