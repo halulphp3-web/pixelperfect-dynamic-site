@@ -6,7 +6,7 @@ export function MapEmbed({
   zoomDelta = 0.02,
 }: {
   points: Point[];
-  height?: number;
+  height?: number | string;
   zoomDelta?: number;
 }) {
   const valid = points.filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
