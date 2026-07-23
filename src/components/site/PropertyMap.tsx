@@ -146,6 +146,15 @@ export function PropertyMap({
     }
   }, [JSON.stringify(valid.map((p) => [p.id, p.lat, p.lng])), currency]);
 
+  useEffect(() => {
+    Object.entries(setHoverRef.current).forEach(([id, fn]) => {
+      fn(id === activeId);
+    });
+    if (activeId && markersRef.current[activeId]) {
+      markersRef.current[activeId].openPopup();
+    }
+  }, [activeId]);
+
   if (valid.length === 0) {
     return (
       <div
