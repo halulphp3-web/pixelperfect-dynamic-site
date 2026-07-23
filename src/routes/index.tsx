@@ -52,10 +52,42 @@ function Home() {
   const { data } = useSuspenseQuery(siteQuery);
   const { settings, menu, hero, services, features, stats, testimonials, featuredProperties } = data;
   const flags = useFlags(settings);
-  const first = hero[0];
   const { currency } = useSite();
   const { data: allProps = [] } = useQuery(allPropsQuery);
   const [filter, setFilter] = useState<{ destination: string; guests: number } | null>(null);
+
+  // Hero slides — filter out empty URLs; fall back to local image if none.
+  const heroSlides = (hero ?? [])
+    .filter((h) => h.image_url && String(h.image_url).trim())
+    .map((h) => ({
+      image_url: h.image_url as string,
+      heading: h.heading ?? settings?.tagline ?? "Feel at home, wherever you land.",
+      subheading: h.subheading ?? "Design-led apartments and villas across Dubai's best neighbourhoods.",
+    }));
+  const slides = heroSlides.length
+    ? heroSlides
+    : [{
+        image_url: "/hero-stays.jpg",
+        heading: hero[0]?.heading ?? settings?.tagline ?? "Feel at home, wherever you land.",
+        subheading: hero[0]?.subheading ?? "Design-led apartments and villas across Dubai's best neighbourhoods.",
+      }];
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const reducedMotion = useRef(false);
+  useEffect(() => {
+    reducedMotion.current = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  }, []);
+  useEffect(() => {
+    if (slides.length <= 1 || paused || reducedMotion.current) return;
+    const id = window.setInterval(() => {
+      if (!document.hidden) setSlideIdx((i) => (i + 1) % slides.length);
+    }, 6000);
+    return () => window.clearInterval(id);
+  }, [slides.length, paused]);
+  const goPrev = () => setSlideIdx((i) => (i - 1 + slides.length) % slides.length);
+  const goNext = () => setSlideIdx((i) => (i + 1) % slides.length);
+  const active = slides[slideIdx] ?? slides[0];
+
 
   const results = filter
     ? allProps.filter((p) => {
