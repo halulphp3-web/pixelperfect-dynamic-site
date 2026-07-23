@@ -62,9 +62,20 @@ function PropertyDetail() {
   const { data: site } = useSuspenseQuery(siteQuery);
   const p = Route.useLoaderData();
   const { currency } = useSite();
-  const gallery = (Array.isArray(p.gallery_urls) ? (p.gallery_urls as any[]) : []).filter(Boolean) as string[];
-  const amenities = (Array.isArray(p.amenities) ? (p.amenities as any[]) : []) as string[];
-  const highlights = (Array.isArray(p.highlights) ? (p.highlights as any[]) : []) as string[];
+  const toList = (v: any): string[] => {
+    if (Array.isArray(v)) return v.filter(Boolean).map(String);
+    if (typeof v === "string" && v.trim()) {
+      try {
+        const j = JSON.parse(v);
+        if (Array.isArray(j)) return j.filter(Boolean).map(String);
+      } catch {}
+      return v.split(",").map((s) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+  const gallery = toList(p.gallery_urls);
+  const amenities = toList(p.amenities);
+  const highlights = toList(p.highlights);
 
   const [range, setRange] = useState<DateRange | undefined>();
   const [guests, setGuests] = useState<number>(p.guests ?? 2);
