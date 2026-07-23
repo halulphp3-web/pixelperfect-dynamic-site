@@ -366,6 +366,50 @@ function PropertyDetail() {
         </aside>
 
       </section>
+
+      {relatedList.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 md:px-6 pb-16">
+          <div className="flex items-end justify-between">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Related stays</h2>
+            <Link to="/properties" className="text-sm font-medium text-primary hover:underline">View all →</Link>
+          </div>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {relatedList.map((r) => (
+              <Link
+                key={r.id}
+                to="/properties/$slug"
+                params={{ slug: r.slug }}
+                className="group overflow-hidden rounded-2xl border border-border bg-card hover:shadow-lg transition"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  {r.cover_image_url && (
+                    <img src={r.cover_image_url} alt={r.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  )}
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5" /> {r.location}
+                  </div>
+                  <div className="mt-1.5 font-semibold line-clamp-1">{r.title}</div>
+                  <div className="mt-3 flex items-baseline justify-between">
+                    <div>
+                      <span className="text-lg font-bold">{formatPrice(Number(r.price_per_night), currency)}</span>
+                      <span className="text-xs text-muted-foreground"> / night</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <GalleryLightbox
+        images={lightboxImages}
+        index={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onIndexChange={setLightboxIndex}
+      />
     </SiteLayout>
   );
 }
