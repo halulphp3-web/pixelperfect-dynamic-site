@@ -8,17 +8,17 @@ export function Footer({ settings }: { settings: Settings }) {
   const socials = (settings?.socials ?? {}) as Record<string, string>;
   const whatsapp = settings?.whatsapp;
   return (
-    <footer className="mt-24 bg-black text-slate-200">
+    <footer className="mt-24 bg-black text-white">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-16 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-1">
           <div className="text-xl font-bold text-white">{settings?.site_name}</div>
-          <p className="mt-4 text-sm text-slate-400 max-w-sm leading-relaxed">
+          <p className="mt-4 text-sm text-white/80 max-w-sm leading-relaxed">
             {settings?.tagline}
           </p>
         </div>
 
         <div>
-          <div className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Information</div>
+          <div className="text-xs font-semibold tracking-widest text-white/60 uppercase mb-4">Information</div>
           <ul className="space-y-3 text-sm">
             <li><Link to="/" className="text-white hover:text-primary transition">Home</Link></li>
             <li><Link to="/properties" className="text-white hover:text-primary transition">Properties</Link></li>
@@ -28,8 +28,8 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
 
         <div>
-          <div className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Contact</div>
-          <ul className="space-y-3 text-sm text-slate-300">
+          <div className="text-xs font-semibold tracking-widest text-white/60 uppercase mb-4">Contact</div>
+          <ul className="space-y-3 text-sm text-white">
             {settings?.email && (
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary shrink-0" />{settings.email}</li>
             )}
@@ -54,20 +54,20 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
 
         <div>
-          <div className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Follow Us</div>
+          <div className="text-xs font-semibold tracking-widest text-white/60 uppercase mb-4">Follow Us</div>
           <div className="flex gap-3">
             {socials.facebook && (
-              <a href={socials.facebook} className="grid h-10 w-10 place-items-center rounded-full bg-slate-800 hover:bg-primary hover:text-primary-foreground transition" aria-label="Facebook">
+              <a href={socials.facebook} className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white hover:bg-primary hover:text-primary-foreground transition" aria-label="Facebook">
                 <Facebook className="h-4 w-4" />
               </a>
             )}
             {socials.instagram && (
-              <a href={socials.instagram} className="grid h-10 w-10 place-items-center rounded-full bg-slate-800 hover:bg-primary hover:text-primary-foreground transition" aria-label="Instagram">
+              <a href={socials.instagram} className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white hover:bg-primary hover:text-primary-foreground transition" aria-label="Instagram">
                 <Instagram className="h-4 w-4" />
               </a>
             )}
             {socials.linkedin && (
-              <a href={socials.linkedin} className="grid h-10 w-10 place-items-center rounded-full bg-slate-800 hover:bg-primary hover:text-primary-foreground transition" aria-label="LinkedIn">
+              <a href={socials.linkedin} className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white hover:bg-primary hover:text-primary-foreground transition" aria-label="LinkedIn">
                 <Linkedin className="h-4 w-4" />
               </a>
             )}
@@ -75,9 +75,9 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 py-5 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 py-5 text-xs text-white/70 flex flex-wrap items-center justify-between gap-2">
           <span>© {new Date().getFullYear()} {settings?.site_name}. All rights reserved.</span>
-          <Link to="/admin" className="hover:text-white transition">Admin</Link>
+          <Link to="/admin" className="text-white/70 hover:text-white transition">Admin</Link>
         </div>
       </div>
     </footer>

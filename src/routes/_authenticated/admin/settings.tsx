@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { updateSettings } from "@/lib/admin.functions";
 import { DEFAULT_FLAGS, type FeatureFlags } from "@/lib/public-content.functions";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   component: SettingsPage,
@@ -91,8 +92,14 @@ function SettingsPage() {
           <Section title="Brand">
             <Field label="Site Name" value={form.site_name} onChange={(v) => set("site_name", v)} />
             <Field label="Tagline" value={form.tagline} onChange={(v) => set("tagline", v)} />
-            <Field label="Logo URL" value={form.logo_url} onChange={(v) => set("logo_url", v)} />
-            <Field label="Favicon URL" value={form.favicon_url} onChange={(v) => set("favicon_url", v)} />
+            <label className="block sm:col-span-2">
+              <span className="block text-sm font-medium mb-1">Logo</span>
+              <ImageUploadField value={form.logo_url} onChange={(v) => set("logo_url", v as string)} />
+            </label>
+            <label className="block sm:col-span-2">
+              <span className="block text-sm font-medium mb-1">Favicon</span>
+              <ImageUploadField value={form.favicon_url} onChange={(v) => set("favicon_url", v as string)} />
+            </label>
           </Section>
 
           <Section title="Contact">
