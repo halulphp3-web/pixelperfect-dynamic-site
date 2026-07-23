@@ -88,6 +88,7 @@ export function PropertyMap({
         iconAnchor: [32, 15],
       });
       const marker = L.marker([lat, lng], { icon }).addTo(map);
+      markersRef.current[p.id] = marker;
       const setHover = (on: boolean) => {
         const el = marker.getElement();
         if (!el) return;
@@ -102,6 +103,7 @@ export function PropertyMap({
         if (label) label.style.display = on ? "none" : "inline";
         if (name) name.style.display = on ? "inline-block" : "none";
       };
+      setHoverRef.current[p.id] = setHover;
       marker.on("mouseover", () => { setHover(true); marker.openPopup(); });
       marker.on("mouseout", () => { setHover(false); });
 
