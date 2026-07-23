@@ -34,8 +34,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         navigate({ to: "/auth" });
         return;
       }
-      const { data: role } = await supabase.rpc("has_role", { _user_id: u.user.id, _role: "admin" });
-      setOk(!!role);
+      try {
+        const { getIsAdmin } = await import("@/lib/admin.functions");
+        const res = await getIsAdmin();
+        setOk(!!res?.isAdmin);
+      } catch {
+        setOk(false);
+      }
       setChecked(true);
     })();
   }, [navigate]);
