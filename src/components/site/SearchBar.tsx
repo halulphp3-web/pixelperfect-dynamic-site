@@ -149,7 +149,12 @@ export function SearchBar({
               mode="range"
               numberOfMonths={2}
               selected={range}
-              onSelect={setRange}
+              onSelect={(r) => {
+                setRange(r);
+                if (r?.from && r?.to) {
+                  setOpenDates(false);
+                }
+              }}
               disabled={{ before: new Date() }}
               className={cn("p-3 pointer-events-auto")}
             />
