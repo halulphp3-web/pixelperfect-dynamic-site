@@ -20,14 +20,18 @@ export function PropertyMap({
   properties,
   currency = "AED",
   height = "100%",
+  activeId = null,
 }: {
   properties: MapProperty[];
   currency?: string;
   height?: number | string;
+  activeId?: string | null;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const popupRootsRef = useRef<Root[]>([]);
+  const markersRef = useRef<Record<string, L.Marker>>({});
+  const setHoverRef = useRef<Record<string, (on: boolean) => void>>({});
 
   const valid = properties.filter(
     (p) => Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)),
