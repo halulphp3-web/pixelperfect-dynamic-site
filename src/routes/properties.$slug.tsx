@@ -93,9 +93,7 @@ function PropertyDetail() {
   const [showAvailability, setShowAvailability] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const lightboxImages = [p.cover_image_url, ...gallery].filter(Boolean) as string[];
-  const related = allProps.filter((x) => x.id !== p.id && (x.location === p.location || x.property_type === p.property_type)).slice(0, 3);
-  const fallbackRelated = allProps.filter((x) => x.id !== p.id).slice(0, 3);
-  const relatedList = related.length > 0 ? related : fallbackRelated;
+  const relatedList = allProps.filter((x) => x.id !== p.id && x.location === p.location).slice(0, 3);
 
   const nights = range?.from && range?.to ? Math.max(0, differenceInCalendarDays(range.to, range.from)) : 0;
   const pricePerNight = Number(p.price_per_night ?? 0);
