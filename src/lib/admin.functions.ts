@@ -90,3 +90,84 @@ export const updateSettings = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// One-shot backfill: re-sign any /object/public/property-images/<path> URLs
+// stored on properties (cover + gallery) into long-lived signed URLs. The
+// bucket is private (workspace policy blocks public buckets), so old
+// getPublicUrl() links return 404.
+export const resignPropertyImageUrls = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+    const PUB_RE = /\/storage\/v1\/object\/public\/property-images\/([^?#\s"']+)/;
+    const resign = async (url: string): Promise<string> => {
+      const m = typeof url === "string" ? url.match(PUB_RE) : null;
+      if (!m) return url;
+      const path = decodeURIComponent(m[1]);
+      const { data, error } = await supabaseAdmin.storage
+        .from("property-images")
+        .createSignedUrl(path, TEN_YEARS);
+      if (error || !data) return url;
+      return data.signedUrl;
+    };
+    const { data: rows, error } = await supabaseAdmin
+      .from("properties")
+      .select("id, cover_image_url, gallery_urls");
+    if (error) throw new Error(error.message);
+    let updated = 0;
+    for (const r of rows ?? []) {
+      const patch: any = {};
+      if (r.cover_image_url) {
+        const nu = await resign(r.cover_image_url);
+        if (nu !== r.cover_image_url) patch.cover_image_url = nu;
+      }
+      if (Array.isArray(r.gallery_urls)) {
+        const next = await Promise.all(r.gallery_urls.map((u: any) => (typeof u === "string" ? resign(u) : u)));
+        if (JSON.stringify(next) !== JSON.stringify(r.gallery_urls)) patch.gallery_urls = next;
+      }
+      if (Object.keys(patch).length > 0) {
+        await supabaseAdmin.from("properties").update(patch).eq("id", r.id);
+        updated++;
+      }
+    }
+    // Also resign hero_slides.image_url and site_settings.logo_url/favicon_url
+    const { data: slides } = await supabaseAdmin.from("hero_slides").select("id, image_url");
+    for (const s of slides ?? []) {
+      if (s.image_url) {
+        const nu = await resign(s.image_url);
+        if (nu !== s.image_url) {
+          await supabaseAdmin.from("hero_slides").update({ image_url: nu }).eq("id", s.id);
+          updated++;
+        }
+      }
+    }
+    const { data: settings } = await supabaseAdmin
+      .from("site_settings")
+      .select("id, logo_url, favicon_url")
+      .eq("id", 1)
+      .maybeSingle();
+    if (settings) {
+      const patch: any = {};
+      if (settings.logo_url) {
+        const nu = await resign(settings.logo_url);
+        if (nu !== settings.logo_url) patch.logo_url = nu;
+      }
+      if (settings.favicon_url) {
+        const nu = await resign(settings.favicon_url);
+        if (nu !== settings.favicon_url) patch.favicon_url = nu;
+      }
+      if (Object.keys(patch).length > 0) {
+        await supabaseAdmin.from("site_settings").update(patch).eq("id", 1);
+        updated++;
+      }
+    }
+    return { ok: true, updated };
+  });
