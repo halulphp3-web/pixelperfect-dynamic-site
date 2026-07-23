@@ -72,24 +72,63 @@ export function SearchBar({
       )}
     >
       {/* Destination */}
-      <label className={cn(cell, "cursor-text")}>
-        <MapPin className="h-4 w-4 text-primary shrink-0" />
-        <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Destination</div>
-          <input
-            list="sb-locations"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            placeholder="Choose a location"
-            className="w-full bg-transparent text-sm font-medium outline-none text-slate-900 placeholder:text-slate-400"
-          />
-          <datalist id="sb-locations">
-            {uniqueLocations.map((l) => (
-              <option key={l} value={l} />
-            ))}
-          </datalist>
-        </div>
-      </label>
+      <Popover open={openDest} onOpenChange={setOpenDest}>
+        <PopoverTrigger asChild>
+          <button type="button" className={cn(cell, "w-full")}>
+            <MapPin className="h-4 w-4 text-primary shrink-0" />
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Destination</div>
+              <div className={cn("truncate text-sm font-medium", !destination && "text-slate-400")}>
+                {destination || "Choose a location"}
+              </div>
+            </div>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          align="start"
+          className="p-0 pointer-events-auto bg-white"
+          style={{ width: "var(--radix-popover-trigger-width)", minWidth: 260 }}
+        >
+          <div className="p-2">
+            <input
+              autoFocus
+              value={destQuery}
+              onChange={(e) => setDestQuery(e.target.value)}
+              placeholder="Search a location…"
+              className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-primary"
+            />
+          </div>
+          <div className="max-h-64 overflow-y-auto pb-2">
+            <button
+              type="button"
+              onClick={() => { setDestination(""); setOpenDest(false); }}
+              className="flex w-full items-center justify-between px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              Any destination
+              {!destination && <Check className="h-4 w-4 text-primary" />}
+            </button>
+            {uniqueLocations
+              .filter((l) => l.toLowerCase().includes(destQuery.toLowerCase()))
+              .map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => { setDestination(l); setOpenDest(false); setDestQuery(""); }}
+                  className="flex w-full items-center justify-between gap-2 px-4 py-2 text-left text-sm text-slate-800 hover:bg-slate-100"
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    <MapPin className="h-3.5 w-3.5 text-primary" />
+                    {l}
+                  </span>
+                  {destination === l && <Check className="h-4 w-4 text-primary" />}
+                </button>
+              ))}
+            {uniqueLocations.filter((l) => l.toLowerCase().includes(destQuery.toLowerCase())).length === 0 && (
+              <div className="px-4 py-6 text-center text-xs text-slate-400">No matches</div>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
 
       {/* Dates */}
       <Popover open={openDates} onOpenChange={setOpenDates}>
