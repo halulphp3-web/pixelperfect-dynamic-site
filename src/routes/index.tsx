@@ -117,30 +117,79 @@ function Home() {
     >
       {/* HERO */}
       {flags.home.hero && (
-        <section className="relative overflow-hidden">
+        <section
+          className="relative overflow-hidden"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
           <div className="absolute inset-0 -z-10">
-            <img
-              src={first?.image_url ?? "/hero-stays.jpg"}
-              alt=""
-              width={1920}
-              height={1080}
-              className="h-full w-full object-cover"
-            />
+            {slides.map((s, i) => (
+              <img
+                key={i}
+                src={s.image_url}
+                alt=""
+                width={1920}
+                height={1080}
+                loading={i === slideIdx ? "eager" : "lazy"}
+                {...(i === slideIdx ? { fetchpriority: "high" as any } : {})}
+                onError={(e) => {
+                  const t = e.currentTarget;
+                  if (!t.src.endsWith("/hero-stays.jpg")) t.src = "/hero-stays.jpg";
+                }}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                  i === slideIdx ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ))}
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
           </div>
           <div className="mx-auto max-w-7xl px-4 md:px-6 pt-24 md:pt-36 pb-28 md:pb-40 text-white">
-            <div className="max-w-3xl animate-fade-in">
+            <div key={slideIdx} className="max-w-3xl animate-fade-in">
               <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-                {first?.heading ?? settings?.tagline ?? "Feel at home, wherever you land."}
+                {active.heading}
               </h1>
               <p className="mt-5 text-lg text-white/85 max-w-xl">
-                {first?.subheading ??
-                  "Design-led apartments and villas across Dubai's best neighbourhoods."}
+                {active.subheading}
               </p>
             </div>
           </div>
+
+          {slides.length > 1 && (
+            <>
+              <button
+                type="button"
+                aria-label="Previous slide"
+                onClick={goPrev}
+                className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm transition"
+              >
+                <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+              </button>
+              <button
+                type="button"
+                aria-label="Next slide"
+                onClick={goNext}
+                className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm transition"
+              >
+                <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+              </button>
+              <div className="absolute bottom-6 md:bottom-10 left-0 right-0 z-10 flex justify-center gap-2">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Go to slide ${i + 1}`}
+                    onClick={() => setSlideIdx(i)}
+                    className={`h-2 rounded-full transition-all ${
+                      i === slideIdx ? "w-8 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </section>
       )}
+
 
       {/* STATS */}
       {flags.home.stats && stats.length > 0 && (
