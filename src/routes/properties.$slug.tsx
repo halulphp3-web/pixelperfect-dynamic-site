@@ -6,12 +6,19 @@ import { format, differenceInCalendarDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { getPropertyBySlug, getSiteData } from "@/lib/public-content.functions";
+import { getPropertyBySlug, getSiteData, listProperties } from "@/lib/public-content.functions";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useSite } from "@/lib/site-context";
 import { formatPrice, convertFromAED, CURRENCY_SYMBOL } from "@/lib/currency";
+import { MapEmbed } from "@/components/site/MapEmbed";
+import { GalleryLightbox } from "@/components/site/GalleryLightbox";
 
 const siteQuery = queryOptions({ queryKey: ["site-data"], queryFn: () => getSiteData(), staleTime: 60_000 });
+const propsListQuery = queryOptions({
+  queryKey: ["properties", "all"],
+  queryFn: () => listProperties({ data: {} }),
+  staleTime: 30_000,
+});
 
 export const Route = createFileRoute("/properties/$slug")({
   loader: async ({ context, params }) => {
