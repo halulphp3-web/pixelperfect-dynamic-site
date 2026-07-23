@@ -74,13 +74,30 @@ export function PropertyMap({
     valid.forEach((p) => {
       const lat = Number(p.lat);
       const lng = Number(p.lng);
+      const safeTitle = p.title.replace(/</g, "&lt;");
       const icon = L.divIcon({
         className: "",
-        html: `<div style="background:#fff;border-radius:9999px;padding:6px 14px;font-size:13px;font-weight:600;color:#111;box-shadow:0 4px 14px rgba(0,0,0,0.18);border:1px solid rgba(0,0,0,0.06);white-space:nowrap;">View</div>`,
+        html: `<div class="pm-pill" style="background:#fff;border-radius:9999px;padding:6px 14px;font-size:13px;font-weight:600;color:#111;box-shadow:0 4px 14px rgba(0,0,0,0.18);border:1px solid rgba(0,0,0,0.06);white-space:nowrap;transition:background .15s ease,color .15s ease;cursor:pointer;"><span class="pm-pill-label">View</span><span class="pm-pill-name" style="display:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;">${safeTitle}</span></div>`,
         iconSize: [64, 30],
         iconAnchor: [32, 15],
       });
       const marker = L.marker([lat, lng], { icon }).addTo(map);
+      const setHover = (on: boolean) => {
+        const el = marker.getElement();
+        if (!el) return;
+        const pill = el.querySelector<HTMLElement>(".pm-pill");
+        const label = el.querySelector<HTMLElement>(".pm-pill-label");
+        const name = el.querySelector<HTMLElement>(".pm-pill-name");
+        if (pill) {
+          pill.style.background = on ? "#111" : "#fff";
+          pill.style.color = on ? "#fff" : "#111";
+          pill.style.zIndex = on ? "1000" : "auto";
+        }
+        if (label) label.style.display = on ? "none" : "inline";
+        if (name) name.style.display = on ? "inline-block" : "none";
+      };
+      marker.on("mouseover", () => { setHover(true); marker.openPopup(); });
+      marker.on("mouseout", () => { setHover(false); });
 
       const popupEl = document.createElement("div");
       const root = createRoot(popupEl);
