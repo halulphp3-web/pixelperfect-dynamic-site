@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { createRoot, type Root } from "react-dom/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { X } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 
 export type MapProperty = {
@@ -111,31 +112,76 @@ export function PropertyMap({
       const root = createRoot(popupEl);
       popupRootsRef.current.push(root);
       root.render(
-        <Link
-          to="/properties/$slug"
-          params={{ slug: p.slug }}
-          style={{ display: "block", width: 220, textDecoration: "none", color: "inherit" }}
+        <div
+          style={{
+            width: 220,
+            background: "#fff",
+            borderRadius: 8,
+            overflow: "hidden",
+            position: "relative",
+            boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+          }}
         >
-          {p.cover_image_url ? (
-            <img
-              src={p.cover_image_url}
-              alt={p.title}
-              style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8 }}
-            />
-          ) : null}
-          <div style={{ marginTop: 8, fontWeight: 600, fontSize: 14, lineHeight: 1.3 }}>
-            {p.title}
-          </div>
-          {p.location ? (
-            <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{p.location}</div>
-          ) : null}
-          <div style={{ marginTop: 6, fontSize: 13, fontWeight: 600 }}>
-            {formatPrice(Number(p.price_per_night), currency)}{" "}
-            <span style={{ fontWeight: 400, color: "#666" }}>/ night</span>
-          </div>
-        </Link>,
+          <button
+            type="button"
+            aria-label="Close popup"
+            onClick={(e) => {
+              e.stopPropagation();
+              marker.closePopup();
+            }}
+            style={{
+              position: "absolute",
+              top: 6,
+              right: 6,
+              zIndex: 10,
+              width: 24,
+              height: 24,
+              borderRadius: "50%",
+              border: "none",
+              background: "rgba(255,255,255,0.95)",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+            }}
+          >
+            <X size={14} color="#000" strokeWidth={2.5} />
+          </button>
+          <Link
+            to="/properties/$slug"
+            params={{ slug: p.slug }}
+            style={{ display: "block", textDecoration: "none" }}
+          >
+            {p.cover_image_url ? (
+              <img
+                src={p.cover_image_url}
+                alt={p.title}
+                style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }}
+              />
+            ) : null}
+            <div style={{ padding: 12 }}>
+              <div
+                style={{
+                  color: "#000",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  lineHeight: 1.3,
+                }}
+              >
+                {p.title}
+              </div>
+              {p.location ? (
+                <div style={{ fontSize: 12, color: "#666", marginTop: 4 }}>{p.location}</div>
+              ) : null}
+              <div style={{ marginTop: 8, fontSize: 13, fontWeight: 600, color: "#000" }}>
+                {formatPrice(Number(p.price_per_night), currency)}{" "}
+                <span style={{ fontWeight: 400, color: "#666" }}>/ night</span>
+              </div>
+            </div>
+          </Link>
+        </div>,
       );
-      marker.bindPopup(popupEl, { minWidth: 220, closeButton: true });
+      marker.bindPopup(popupEl, { minWidth: 220, closeButton: false });
       bounds.extend([lat, lng]);
     });
 
