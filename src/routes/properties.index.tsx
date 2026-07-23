@@ -157,7 +157,7 @@ function PropertiesPage() {
                 points={filtered
                   .map((p) => ({ lat: Number(p.lat), lng: Number(p.lng) }))
                   .filter((pt) => Number.isFinite(pt.lat) && Number.isFinite(pt.lng))}
-                height={Number.NaN as unknown as number}
+                height="100%"
               />
             </aside>
           )}
