@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { createRoot, type Root } from "react-dom/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { formatPrice, type Currency } from "@/lib/currency";
+import { formatPrice } from "@/lib/currency";
 
 export type MapProperty = {
   id: string;
@@ -22,7 +22,7 @@ export function PropertyMap({
   height = "100%",
 }: {
   properties: MapProperty[];
-  currency?: Currency;
+  currency?: string;
   height?: number | string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
