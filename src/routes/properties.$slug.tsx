@@ -6,17 +6,25 @@ import { format, differenceInCalendarDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { getPropertyBySlug, getSiteData } from "@/lib/public-content.functions";
+import { getPropertyBySlug, getSiteData, listProperties } from "@/lib/public-content.functions";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useSite } from "@/lib/site-context";
 import { formatPrice, convertFromAED, CURRENCY_SYMBOL } from "@/lib/currency";
+import { MapEmbed } from "@/components/site/MapEmbed";
+import { GalleryLightbox } from "@/components/site/GalleryLightbox";
 
 const siteQuery = queryOptions({ queryKey: ["site-data"], queryFn: () => getSiteData(), staleTime: 60_000 });
+const propsListQuery = queryOptions({
+  queryKey: ["properties", "all"],
+  queryFn: () => listProperties({ data: {} }),
+  staleTime: 30_000,
+});
 
 export const Route = createFileRoute("/properties/$slug")({
   loader: async ({ context, params }) => {
-    const [_, prop] = await Promise.all([
+    const [_, __, prop] = await Promise.all([
       context.queryClient.ensureQueryData(siteQuery),
+      context.queryClient.ensureQueryData(propsListQuery),
       context.queryClient.ensureQueryData(
         queryOptions({
           queryKey: ["property", params.slug],
@@ -60,6 +68,7 @@ export const Route = createFileRoute("/properties/$slug")({
 
 function PropertyDetail() {
   const { data: site } = useSuspenseQuery(siteQuery);
+  const { data: allProps } = useSuspenseQuery(propsListQuery);
   const p = Route.useLoaderData();
   const { currency } = useSite();
   const toList = (v: any): string[] => {
@@ -82,6 +91,11 @@ function PropertyDetail() {
   const [openDates, setOpenDates] = useState(false);
   const [openGuests, setOpenGuests] = useState(false);
   const [showAvailability, setShowAvailability] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const lightboxImages = [p.cover_image_url, ...gallery].filter(Boolean) as string[];
+  const related = allProps.filter((x) => x.id !== p.id && (x.location === p.location || x.property_type === p.property_type)).slice(0, 3);
+  const fallbackRelated = allProps.filter((x) => x.id !== p.id).slice(0, 3);
+  const relatedList = related.length > 0 ? related : fallbackRelated;
 
   const nights = range?.from && range?.to ? Math.max(0, differenceInCalendarDays(range.to, range.from)) : 0;
   const pricePerNight = Number(p.price_per_night ?? 0);
@@ -113,21 +127,30 @@ function PropertyDetail() {
 
       <section className="mx-auto max-w-7xl px-4 md:px-6 mt-6">
         <div className="grid gap-3 md:grid-cols-4 md:grid-rows-2 md:h-[480px]">
-          <div className="md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl bg-muted">
+          <button
+            type="button"
+            onClick={() => setLightboxIndex(0)}
+            className="md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl bg-muted text-left"
+          >
             {p.cover_image_url && (
               <img
                 src={p.cover_image_url}
                 alt={p.title}
                 width={1600}
                 height={1067}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
               />
             )}
-          </div>
+          </button>
           {gallery.slice(0, 4).map((src, i) => (
-            <div key={i} className="hidden md:block overflow-hidden rounded-2xl bg-muted">
-              <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
-            </div>
+            <button
+              key={i}
+              type="button"
+              onClick={() => setLightboxIndex(i + 1)}
+              className="hidden md:block overflow-hidden rounded-2xl bg-muted"
+            >
+              <img src={src} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+            </button>
           ))}
         </div>
       </section>
@@ -179,6 +202,20 @@ function PropertyDetail() {
                 <div className="font-medium">Check-out</div>
                 <div className="text-muted-foreground">{p.check_out_time ?? "11:00"}</div>
               </div>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">Location</h2>
+              {p.location && (
+                <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4" /> {p.location}
+                </span>
+              )}
+            </div>
+            <div className="mt-4">
+              <MapEmbed points={[{ lat: Number(p.lat), lng: Number(p.lng) }]} height={360} />
             </div>
           </div>
         </div>
@@ -329,6 +366,50 @@ function PropertyDetail() {
         </aside>
 
       </section>
+
+      {relatedList.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 md:px-6 pb-16">
+          <div className="flex items-end justify-between">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Related stays</h2>
+            <Link to="/properties" className="text-sm font-medium text-primary hover:underline">View all →</Link>
+          </div>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {relatedList.map((r) => (
+              <Link
+                key={r.id}
+                to="/properties/$slug"
+                params={{ slug: r.slug }}
+                className="group overflow-hidden rounded-2xl border border-border bg-card hover:shadow-lg transition"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  {r.cover_image_url && (
+                    <img src={r.cover_image_url} alt={r.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  )}
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5" /> {r.location}
+                  </div>
+                  <div className="mt-1.5 font-semibold line-clamp-1">{r.title}</div>
+                  <div className="mt-3 flex items-baseline justify-between">
+                    <div>
+                      <span className="text-lg font-bold">{formatPrice(Number(r.price_per_night), currency)}</span>
+                      <span className="text-xs text-muted-foreground"> / night</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <GalleryLightbox
+        images={lightboxImages}
+        index={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onIndexChange={setLightboxIndex}
+      />
     </SiteLayout>
   );
 }
