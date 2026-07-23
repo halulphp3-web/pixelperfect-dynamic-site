@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Moon, Sun, Globe } from "lucide-react";
+import { Moon, Sun, Globe, Check, ChevronDown } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 import type { FeatureFlags } from "@/lib/public-content.functions";
 import { useSite } from "@/lib/site-context";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SearchBar } from "./SearchBar";
 
 type Settings = Tables<"site_settings"> | null;
