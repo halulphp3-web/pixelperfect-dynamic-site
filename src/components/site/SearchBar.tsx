@@ -20,8 +20,10 @@ export function SearchBar({
 }) {
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
+  const [destQuery, setDestQuery] = useState("");
   const [range, setRange] = useState<DateRange | undefined>();
   const [guests, setGuests] = useState(2);
+  const [openDest, setOpenDest] = useState(false);
   const [openDates, setOpenDates] = useState(false);
   const [openGuests, setOpenGuests] = useState(false);
 
