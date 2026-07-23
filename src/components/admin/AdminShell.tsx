@@ -60,9 +60,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     );
 
   return (
-    <div className="min-h-screen flex bg-muted/20">
-      <aside className="w-64 shrink-0 border-r border-border bg-card hidden md:flex flex-col">
-        <div className="h-16 flex items-center px-5 border-b border-border font-bold">Admin</div>
+    <div className="min-h-screen flex bg-neutral-950 text-slate-100">
+      <aside className="w-64 shrink-0 border-r border-white/10 bg-black hidden md:flex flex-col">
+        <div className="h-16 flex items-center px-5 border-b border-white/10 font-bold text-white">Admin</div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {nav.map((n) => {
             const active = n.exact ? path === n.to : path.startsWith(n.to);
@@ -70,8 +70,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={n.to}
                 to={n.to}
-                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
-                  active ? "bg-primary text-primary-foreground" : "hover:bg-accent text-muted-foreground hover:text-foreground"
+                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition ${
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-slate-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <n.icon className="h-4 w-4" />
@@ -80,23 +82,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="p-3 border-t border-border space-y-1">
-          <Link to="/" className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent">
+        <div className="p-3 border-t border-white/10 space-y-1">
+          <Link to="/" className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white">
             <Home className="h-4 w-4" /> View site
           </Link>
-          <button onClick={signOut} className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent">
+          <button onClick={signOut} className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white">
             <LogOut className="h-4 w-4" /> Sign out
           </button>
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 md:px-6">
-          <div className="md:hidden font-bold">Admin</div>
+        <header className="h-16 border-b border-white/10 bg-black flex items-center justify-between px-4 md:px-6">
+          <div className="md:hidden font-bold text-white">Admin</div>
           <div className="ml-auto flex items-center gap-2">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">View site →</Link>
+            <Link to="/" className="text-sm text-slate-300 hover:text-white">View site →</Link>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-8">{children}</main>
+        <main className="flex-1 p-4 md:p-8 bg-neutral-950 text-slate-100">{children}</main>
       </div>
     </div>
   );
