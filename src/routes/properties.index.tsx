@@ -9,6 +9,7 @@ import { SiteLayout, useFlags } from "@/components/site/SiteLayout";
 import { SearchBar } from "@/components/site/SearchBar";
 import { useSite } from "@/lib/site-context";
 import { formatPrice } from "@/lib/currency";
+import { MapEmbed } from "@/components/site/MapEmbed";
 
 const siteQuery = queryOptions({ queryKey: ["site-data"], queryFn: () => getSiteData(), staleTime: 60_000 });
 const propsQuery = queryOptions({
