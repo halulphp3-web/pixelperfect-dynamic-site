@@ -9,7 +9,9 @@ import { SiteLayout, useFlags } from "@/components/site/SiteLayout";
 import { SearchBar } from "@/components/site/SearchBar";
 import { useSite } from "@/lib/site-context";
 import { formatPrice } from "@/lib/currency";
-import { MapEmbed } from "@/components/site/MapEmbed";
+import { ClientOnly } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
+const PropertyMap = lazy(() => import("@/components/site/PropertyMap"));
 
 const siteQuery = queryOptions({ queryKey: ["site-data"], queryFn: () => getSiteData(), staleTime: 60_000 });
 const propsQuery = queryOptions({
@@ -153,12 +155,24 @@ function PropertiesPage() {
 
           {flags.properties_page.map && (
             <aside className="hidden lg:block sticky top-24 h-[calc(100vh-8rem)] rounded-2xl border border-border bg-muted/40 overflow-hidden">
-              <MapEmbed
-                points={filtered
-                  .map((p) => ({ lat: Number(p.lat), lng: Number(p.lng) }))
-                  .filter((pt) => Number.isFinite(pt.lat) && Number.isFinite(pt.lng))}
-                height="100%"
-              />
+              <ClientOnly fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
+                <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
+                  <PropertyMap
+                    properties={filtered.map((p) => ({
+                      id: p.id,
+                      slug: p.slug,
+                      title: p.title,
+                      lat: p.lat as any,
+                      lng: p.lng as any,
+                      price_per_night: p.price_per_night,
+                      cover_image_url: p.cover_image_url,
+                      location: p.location,
+                    }))}
+                    currency={currency}
+                    height="100%"
+                  />
+                </Suspense>
+              </ClientOnly>
             </aside>
           )}
         </div>
