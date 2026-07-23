@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as Icons from "lucide-react";
-import { ArrowRight, BedDouble, Bath, Users, MapPin, Quote, Star } from "lucide-react";
+import { ArrowRight, BedDouble, Bath, Users, MapPin, Quote, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { getSiteData, listProperties } from "@/lib/public-content.functions";
 import { SiteLayout, useFlags } from "@/components/site/SiteLayout";
 import { SearchBar } from "@/components/site/SearchBar";
