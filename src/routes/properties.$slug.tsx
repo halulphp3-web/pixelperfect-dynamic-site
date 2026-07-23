@@ -22,8 +22,9 @@ const propsListQuery = queryOptions({
 
 export const Route = createFileRoute("/properties/$slug")({
   loader: async ({ context, params }) => {
-    const [_, prop] = await Promise.all([
+    const [_, __, prop] = await Promise.all([
       context.queryClient.ensureQueryData(siteQuery),
+      context.queryClient.ensureQueryData(propsListQuery),
       context.queryClient.ensureQueryData(
         queryOptions({
           queryKey: ["property", params.slug],
