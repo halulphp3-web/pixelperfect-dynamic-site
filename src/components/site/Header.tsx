@@ -25,7 +25,8 @@ export function Header({
   hideSearch?: boolean;
 }) {
   const [scrolled, setScrolled] = useState(false);
-  const { currency, setCurrency, supportedCurrencies, lang, setLang, theme, toggleTheme } = useSite();
+  const { currency, setCurrency, supportedCurrencies, lang, setLang, supportedLangs, theme, toggleTheme } = useSite();
+  const activeLang = supportedLangs.find((l) => l.code === lang) ?? supportedLangs[0];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
