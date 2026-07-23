@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { createRoot, type Root } from "react-dom/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { X } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 
 export type MapProperty = {
