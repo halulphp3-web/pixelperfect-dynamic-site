@@ -35,7 +35,7 @@ export function ImageUploadField({
         const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from("property-images")
-          .upload(path, file, { cacheControl: "3600", upsert: false });
+          .upload(path, file, { cacheControl: "3600", contentType: file.type || undefined, upsert: false });
         if (upErr) throw upErr;
         // Bucket is private (workspace policy blocks public buckets); use a
         // long-lived signed URL so images render on the public site.
@@ -44,6 +44,7 @@ export function ImageUploadField({
           .from("property-images")
           .createSignedUrl(path, TEN_YEARS);
         if (signErr) throw signErr;
+        if (!signed?.signedUrl) throw new Error("Uploaded image URL could not be created");
         uploaded.push(signed.signedUrl);
       }
       if (multiple) onChange([...urls, ...uploaded]);
