@@ -20,6 +20,15 @@ const allPropsQuery = queryOptions({
   staleTime: 30_000,
 });
 
+const HERO_FALLBACK_IMAGE = "/hero-stays.jpg";
+
+function getHeroImageUrl(value: unknown) {
+  if (typeof value !== "string") return HERO_FALLBACK_IMAGE;
+  const url = value.trim();
+  if (!url || url === "null" || url === "undefined") return HERO_FALLBACK_IMAGE;
+  return url;
+}
+
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(siteQuery),
   head: () => ({
@@ -56,18 +65,17 @@ function Home() {
   const { data: allProps = [] } = useQuery(allPropsQuery);
   const [filter, setFilter] = useState<{ destination: string; guests: number } | null>(null);
 
-  // Hero slides — filter out empty URLs; fall back to local image if none.
+  // Hero slides — normalize image URLs and keep a local fallback behind them.
   const heroSlides = (hero ?? [])
-    .filter((h) => h.image_url && String(h.image_url).trim())
     .map((h) => ({
-      image_url: h.image_url as string,
+      image_url: getHeroImageUrl(h.image_url),
       heading: h.heading ?? settings?.tagline ?? "Feel at home, wherever you land.",
       subheading: h.subheading ?? "Design-led apartments and villas across Dubai's best neighbourhoods.",
     }));
   const slides = heroSlides.length
     ? heroSlides
     : [{
-        image_url: "/hero-stays.jpg",
+        image_url: HERO_FALLBACK_IMAGE,
         heading: hero[0]?.heading ?? settings?.tagline ?? "Feel at home, wherever you land.",
         subheading: hero[0]?.subheading ?? "Design-led apartments and villas across Dubai's best neighbourhoods.",
       }];
@@ -118,11 +126,19 @@ function Home() {
       {/* HERO */}
       {flags.home.hero && (
         <section
-          className="relative overflow-hidden"
+          className="relative isolate overflow-hidden bg-muted"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 z-0">
+            <img
+              src={HERO_FALLBACK_IMAGE}
+              alt=""
+              width={1920}
+              height={1080}
+              loading="eager"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
             {slides.map((s, i) => (
               <img
                 key={i}
@@ -134,7 +150,7 @@ function Home() {
                 {...(i === slideIdx ? { fetchPriority: "high" as const } : {})}
                 onError={(e) => {
                   const t = e.currentTarget;
-                  if (!t.src.endsWith("/hero-stays.jpg")) t.src = "/hero-stays.jpg";
+                  if (!t.src.endsWith(HERO_FALLBACK_IMAGE)) t.src = HERO_FALLBACK_IMAGE;
                 }}
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
                   i === slideIdx ? "opacity-100" : "opacity-0"
@@ -143,7 +159,7 @@ function Home() {
             ))}
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
           </div>
-          <div className="mx-auto max-w-7xl px-4 md:px-6 pt-20 sm:pt-28 md:pt-36 pb-20 sm:pb-28 md:pb-40 text-white">
+          <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6 pt-20 sm:pt-28 md:pt-36 pb-20 sm:pb-28 md:pb-40 text-white">
             <div key={slideIdx} className="max-w-3xl animate-fade-in">
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
                 {active.heading}
@@ -161,7 +177,7 @@ function Home() {
                 type="button"
                 aria-label="Previous slide"
                 onClick={goPrev}
-                className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm transition"
+                className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 grid place-items-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm transition"
               >
                 <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
               </button>
@@ -169,11 +185,11 @@ function Home() {
                 type="button"
                 aria-label="Next slide"
                 onClick={goNext}
-                className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-10 grid place-items-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm transition"
+                className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 grid place-items-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm transition"
               >
                 <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
               </button>
-              <div className="absolute bottom-6 md:bottom-10 left-0 right-0 z-10 flex justify-center gap-2">
+              <div className="absolute bottom-6 md:bottom-10 left-0 right-0 z-20 flex justify-center gap-2">
                 {slides.map((_, i) => (
                   <button
                     key={i}
