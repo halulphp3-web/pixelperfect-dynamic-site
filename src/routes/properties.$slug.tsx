@@ -124,11 +124,11 @@ function PropertyDetail() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 md:px-6 mt-6">
-        <div className="grid gap-3 md:grid-cols-4 md:grid-rows-2 md:h-[480px]">
+        <div className="grid gap-2 sm:gap-3 grid-cols-2 md:grid-cols-4 md:grid-rows-2 md:h-[480px]">
           <button
             type="button"
             onClick={() => setLightboxIndex(0)}
-            className="md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl bg-muted text-left"
+            className="col-span-2 md:row-span-2 aspect-[4/3] md:aspect-auto overflow-hidden rounded-2xl bg-muted text-left"
           >
             {p.cover_image_url && (
               <img
@@ -145,13 +145,14 @@ function PropertyDetail() {
               key={i}
               type="button"
               onClick={() => setLightboxIndex(i + 1)}
-              className="hidden md:block overflow-hidden rounded-2xl bg-muted"
+              className={`overflow-hidden rounded-2xl bg-muted aspect-[4/3] md:aspect-auto ${i >= 2 ? "hidden sm:block" : ""}`}
             >
               <img src={src} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
             </button>
           ))}
         </div>
       </section>
+
 
       <section className="mx-auto max-w-7xl px-4 md:px-6 py-12 grid gap-10 lg:grid-cols-[1fr_360px]">
         <div>

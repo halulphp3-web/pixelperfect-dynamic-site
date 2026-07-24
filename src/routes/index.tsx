@@ -143,16 +143,17 @@ function Home() {
             ))}
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
           </div>
-          <div className="mx-auto max-w-7xl px-4 md:px-6 pt-24 md:pt-36 pb-28 md:pb-40 text-white">
+          <div className="mx-auto max-w-7xl px-4 md:px-6 pt-20 sm:pt-28 md:pt-36 pb-20 sm:pb-28 md:pb-40 text-white">
             <div key={slideIdx} className="max-w-3xl animate-fade-in">
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
                 {active.heading}
               </h1>
-              <p className="mt-5 text-lg text-white/85 max-w-xl">
+              <p className="mt-4 sm:mt-5 text-base sm:text-lg text-white/85 max-w-xl">
                 {active.subheading}
               </p>
             </div>
           </div>
+
 
           {slides.length > 1 && (
             <>
