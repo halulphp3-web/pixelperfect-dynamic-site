@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Link } from "@tanstack/react-router";
 import { createRoot, type Root } from "react-dom/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -147,9 +146,8 @@ export function PropertyMap({
           >
             <X size={14} color="#000" strokeWidth={2.5} />
           </button>
-          <Link
-            to="/properties/$slug"
-            params={{ slug: p.slug }}
+          <a
+            href={`/properties/${encodeURIComponent(p.slug)}`}
             style={{ display: "block", textDecoration: "none" }}
           >
             {p.cover_image_url ? (
@@ -178,7 +176,7 @@ export function PropertyMap({
                 <span style={{ fontWeight: 400, color: "#666" }}>/ night</span>
               </div>
             </div>
-          </Link>
+          </a>
         </div>,
       );
       marker.bindPopup(popupEl, { minWidth: 220, closeButton: false });
