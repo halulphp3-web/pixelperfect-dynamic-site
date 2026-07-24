@@ -33,13 +33,13 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(siteQuery),
   head: () => ({
     meta: [
-      { title: "Curated holiday homes in Dubai — book with confidence" },
+      { title: "Tadabeer Holiday Homes Co. L.L.C — book with confidence" },
       {
         name: "description",
         content:
           "Hand-picked apartments, villas, and studios across Dubai. Verified hosts, 24/7 support, easy check-in.",
       },
-      { property: "og:title", content: "Curated holiday homes in Dubai — book with confidence" },
+      { property: "og:title", content: "Tadabeer Holiday Homes Co. L.L.C — book with confidence" },
       { property: "og:description", content: "Hand-picked apartments, villas, and studios across Dubai. Verified hosts, 24/7 support, easy check-in." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
