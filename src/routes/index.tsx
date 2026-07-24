@@ -131,7 +131,7 @@ function Home() {
                 width={1920}
                 height={1080}
                 loading={i === slideIdx ? "eager" : "lazy"}
-                {...(i === slideIdx ? { fetchpriority: "high" as any } : {})}
+                {...(i === slideIdx ? { fetchPriority: "high" as const } : {})}
                 onError={(e) => {
                   const t = e.currentTarget;
                   if (!t.src.endsWith("/hero-stays.jpg")) t.src = "/hero-stays.jpg";
