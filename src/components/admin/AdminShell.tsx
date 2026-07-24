@@ -5,6 +5,7 @@ import {
   Newspaper, Image as ImageIcon, MenuIcon, Star, Gauge, LogOut, Home, BedDouble,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const nav = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -21,10 +22,46 @@ const nav = [
   { to: "/admin/media", label: "Media Library", icon: ImageIcon },
 ];
 
+function NavList({ path, onNavigate, onSignOut }: { path: string; onNavigate?: () => void; onSignOut: () => void }) {
+  return (
+    <>
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        {nav.map((n) => {
+          const active = n.exact ? path === n.to : path.startsWith(n.to);
+          return (
+            <Link
+              key={n.to}
+              to={n.to}
+              onClick={onNavigate}
+              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition ${
+                active
+                  ? "bg-primary text-primary-foreground"
+                  : "text-foreground/70 hover:bg-accent hover:text-foreground"
+              }`}
+            >
+              <n.icon className="h-4 w-4" />
+              {n.label}
+            </Link>
+          );
+        })}
+      </nav>
+      <div className="p-3 border-t border-border space-y-1">
+        <Link to="/" onClick={onNavigate} className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground/70 hover:bg-accent hover:text-foreground">
+          <Home className="h-4 w-4" /> View site
+        </Link>
+        <button onClick={onSignOut} className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground/70 hover:bg-accent hover:text-foreground">
+          <LogOut className="h-4 w-4" /> Sign out
+        </button>
+      </div>
+    </>
+  );
+}
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [checked, setChecked] = useState(false);
   const [ok, setOk] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
@@ -66,43 +103,35 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
-      <aside className="w-64 shrink-0 border-r border-border bg-card flex flex-col">
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-64 shrink-0 border-r border-border bg-card flex-col">
         <div className="h-16 flex items-center px-5 border-b border-border font-bold">Admin</div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {nav.map((n) => {
-            const active = n.exact ? path === n.to : path.startsWith(n.to);
-            return (
-              <Link
-                key={n.to}
-                to={n.to}
-                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition ${
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground/70 hover:bg-accent hover:text-foreground"
-                }`}
-              >
-                <n.icon className="h-4 w-4" />
-                {n.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-3 border-t border-border space-y-1">
-          <Link to="/" className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground/70 hover:bg-accent hover:text-foreground">
-            <Home className="h-4 w-4" /> View site
-          </Link>
-          <button onClick={signOut} className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm text-foreground/70 hover:bg-accent hover:text-foreground">
-            <LogOut className="h-4 w-4" /> Sign out
-          </button>
-        </div>
+        <NavList path={path} onSignOut={signOut} />
       </aside>
+
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 md:px-6">
+        <header className="h-14 lg:h-16 border-b border-border bg-card flex items-center gap-2 px-3 md:px-6">
+          {/* Mobile drawer trigger */}
+          <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <SheetTrigger asChild>
+              <button
+                aria-label="Open menu"
+                className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-accent"
+              >
+                <MenuIcon className="h-4 w-4" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-0 bg-card text-foreground flex flex-col">
+              <div className="h-14 flex items-center px-5 border-b border-border font-bold">Admin</div>
+              <NavList path={path} onNavigate={() => setDrawerOpen(false)} onSignOut={signOut} />
+            </SheetContent>
+          </Sheet>
+          <div className="font-semibold text-sm lg:hidden">Admin</div>
           <div className="ml-auto flex items-center gap-2">
             <Link to="/" className="text-sm text-foreground/70 hover:text-foreground">View site →</Link>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-8 bg-background text-foreground">{children}</main>
+        <main className="flex-1 p-4 md:p-8 bg-background text-foreground overflow-x-hidden">{children}</main>
       </div>
     </div>
   );

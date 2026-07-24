@@ -72,42 +72,45 @@ export function CrudPage({
       </div>
 
       <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left">
-            <tr>
-              {fields.slice(0, 4).map((f) => (
-                <th key={f.key} className="px-4 py-2 font-medium">{f.label}</th>
-              ))}
-              <th className="px-4 py-2 font-medium">Active</th>
-              <th className="px-4 py-2" />
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading && (
-              <tr><td className="p-4 text-muted-foreground" colSpan={fields.length + 2}>Loading…</td></tr>
-            )}
-            {!isLoading && filtered.length === 0 && (
-              <tr><td className="p-4 text-muted-foreground" colSpan={fields.length + 2}>No items yet.</td></tr>
-            )}
-            {filtered.map((r: any) => (
-              <tr key={r.id} className="border-t border-border">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[560px]">
+            <thead className="bg-muted/50 text-left">
+              <tr>
                 {fields.slice(0, 4).map((f) => (
-                  <td key={f.key} className="px-4 py-2 align-top max-w-xs truncate">{String(r[f.key] ?? "—")}</td>
+                  <th key={f.key} className="px-4 py-2 font-medium whitespace-nowrap">{f.label}</th>
                 ))}
-                <td className="px-4 py-2">
-                  <span className={`rounded-full px-2 py-0.5 text-xs ${r.active === false ? "bg-muted text-muted-foreground" : "bg-green-500/10 text-green-600"}`}>
-                    {r.active === false ? "inactive" : "active"}
-                  </span>
-                </td>
-                <td className="px-4 py-2 text-right">
-                  <button onClick={() => setEditing(r)} className="mr-2 rounded-md p-1.5 hover:bg-accent"><Pencil className="h-4 w-4" /></button>
-                  <button onClick={() => remove(r.id)} className="rounded-md p-1.5 hover:bg-accent text-destructive"><Trash2 className="h-4 w-4" /></button>
-                </td>
+                <th className="px-4 py-2 font-medium whitespace-nowrap">Active</th>
+                <th className="px-4 py-2" />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {isLoading && (
+                <tr><td className="p-4 text-muted-foreground" colSpan={fields.length + 2}>Loading…</td></tr>
+              )}
+              {!isLoading && filtered.length === 0 && (
+                <tr><td className="p-4 text-muted-foreground" colSpan={fields.length + 2}>No items yet.</td></tr>
+              )}
+              {filtered.map((r: any) => (
+                <tr key={r.id} className="border-t border-border">
+                  {fields.slice(0, 4).map((f) => (
+                    <td key={f.key} className="px-4 py-2 align-top max-w-xs truncate">{String(r[f.key] ?? "—")}</td>
+                  ))}
+                  <td className="px-4 py-2">
+                    <span className={`rounded-full px-2 py-0.5 text-xs whitespace-nowrap ${r.active === false ? "bg-muted text-muted-foreground" : "bg-green-500/10 text-green-600"}`}>
+                      {r.active === false ? "inactive" : "active"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 text-right whitespace-nowrap">
+                    <button onClick={() => setEditing(r)} className="mr-2 rounded-md p-1.5 hover:bg-accent"><Pencil className="h-4 w-4" /></button>
+                    <button onClick={() => remove(r.id)} className="rounded-md p-1.5 hover:bg-accent text-destructive"><Trash2 className="h-4 w-4" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
 
       {editing && (
         <EditModal fields={fields} row={editing} onCancel={() => setEditing(null)} onSave={save} />
@@ -121,9 +124,10 @@ function EditModal({
 }: { fields: FieldDef[]; row: any; onCancel: () => void; onSave: (r: any) => void }) {
   const [form, setForm] = useState<any>(row);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl rounded-xl bg-card text-card-foreground border border-border shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/80 p-2 sm:p-4 backdrop-blur-sm overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-xl bg-card text-card-foreground border border-border shadow-2xl p-4 sm:p-6 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto my-auto">
         <h2 className="text-lg font-bold">{row.id ? "Edit" : "New"}</h2>
+
         <div className="mt-4 space-y-4">
           {fields.map((f) => (
             <div key={f.key}>
@@ -176,11 +180,12 @@ function EditModal({
             </div>
           ))}
         </div>
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <button onClick={onCancel} className="rounded-md border border-border px-4 py-2 text-sm">Cancel</button>
           <button onClick={() => onSave(form)} className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground">Save</button>
         </div>
       </div>
     </div>
+
   );
 }

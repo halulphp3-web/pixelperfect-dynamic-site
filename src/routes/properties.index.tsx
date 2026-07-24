@@ -157,28 +157,52 @@ function PropertiesPage() {
           </div>
 
           {flags.properties_page.map && (
-            <aside className="hidden lg:block sticky top-24 h-[calc(100vh-8rem)] rounded-2xl border border-border bg-muted/40 overflow-hidden">
-              <ClientOnly fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
-                <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
-                  <PropertyMap
-                    properties={filtered.map((p) => ({
-                      id: p.id,
-                      slug: p.slug,
-                      title: p.title,
-                      lat: p.lat as any,
-                      lng: p.lng as any,
-                      price_per_night: p.price_per_night,
-                      cover_image_url: p.cover_image_url,
-                      location: p.location,
-                    }))}
-                    currency={currency}
-                    activeId={hoverId}
-                    height="100%"
-                  />
-                </Suspense>
-              </ClientOnly>
-            </aside>
+            <>
+              <aside className="hidden lg:block sticky top-24 h-[calc(100vh-8rem)] rounded-2xl border border-border bg-muted/40 overflow-hidden">
+                <ClientOnly fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
+                  <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
+                    <PropertyMap
+                      properties={filtered.map((p) => ({
+                        id: p.id,
+                        slug: p.slug,
+                        title: p.title,
+                        lat: p.lat as any,
+                        lng: p.lng as any,
+                        price_per_night: p.price_per_night,
+                        cover_image_url: p.cover_image_url,
+                        location: p.location,
+                      }))}
+                      currency={currency}
+                      activeId={hoverId}
+                      height="100%"
+                    />
+                  </Suspense>
+                </ClientOnly>
+              </aside>
+              <div className="lg:hidden mt-2 h-[380px] rounded-2xl border border-border bg-muted/40 overflow-hidden">
+                <ClientOnly fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
+                  <Suspense fallback={<div className="h-full w-full bg-muted animate-pulse" />}>
+                    <PropertyMap
+                      properties={filtered.map((p) => ({
+                        id: p.id,
+                        slug: p.slug,
+                        title: p.title,
+                        lat: p.lat as any,
+                        lng: p.lng as any,
+                        price_per_night: p.price_per_night,
+                        cover_image_url: p.cover_image_url,
+                        location: p.location,
+                      }))}
+                      currency={currency}
+                      activeId={hoverId}
+                      height="100%"
+                    />
+                  </Suspense>
+                </ClientOnly>
+              </div>
+            </>
           )}
+
         </div>
       </section>
     </SiteLayout>

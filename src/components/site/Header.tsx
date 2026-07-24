@@ -41,7 +41,7 @@ export function Header({
         scrolled ? "bg-background/95 backdrop-blur border-b border-border" : "bg-background/80 backdrop-blur-sm border-b border-border/60"
       }`}
     >
-      <div className="mx-auto flex items-center gap-4 max-w-7xl px-4 md:px-6 py-3">
+      <div className="mx-auto flex items-center gap-2 md:gap-4 max-w-7xl px-3 md:px-6 py-3">
         <Link to="/" className="flex shrink-0 items-center gap-2 font-bold text-lg tracking-tight text-foreground">
           {settings?.logo_url ? (
             <img src={settings.logo_url} alt={settings.site_name} className="h-9 w-auto" />

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { MapPin, CalendarDays, Users, Search, Check } from "lucide-react";
 import { format } from "date-fns";
@@ -6,6 +6,7 @@ import type { DateRange } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+
 
 export function SearchBar({
   locations = [],
@@ -26,6 +27,14 @@ export function SearchBar({
   const [openDest, setOpenDest] = useState(false);
   const [openDates, setOpenDates] = useState(false);
   const [openGuests, setOpenGuests] = useState(false);
+  const [months, setMonths] = useState(2);
+  useEffect(() => {
+    const update = () => setMonths(window.innerWidth < 640 ? 1 : 2);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
 
   const uniqueLocations = useMemo(
     () => Array.from(new Set(locations.filter(Boolean))).sort(),
@@ -147,7 +156,7 @@ export function SearchBar({
           <div className="p-2">
             <Calendar
               mode="range"
-              numberOfMonths={2}
+              numberOfMonths={months}
               selected={range}
               onSelect={(r) => {
                 setRange(r);
